@@ -1,0 +1,71 @@
+plugins {
+	id 'org.springframework.boot' version '2.6.5'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+
+	// querydsl 추가
+	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+}
+
+group = 'com.1ndex'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	runtimeOnly 'org.postgresql:postgresql'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	//string 처리 관련 library
+	implementation 'org.apache.commons:commons-lang3'
+
+	// querydsl 추가
+	implementation "com.querydsl:querydsl-jpa"
+	//implementation "com.querydsl:querydsl-apt" <-- 를 넣으면 duplicate class error 뜸.
+
+	annotationProcessor(
+			'org.projectlombok:lombok',
+			"javax.persistence:javax.persistence-api",
+			"javax.annotation:javax.annotation-api"
+	)
+}
+
+//#region ======== querydsl ========
+//Q타입 생성 : Gradle → Tasks → build → clean, Gradle → Tasks → other → compileQuerydsl
+def querydslDir = "$buildDir/generated/querydsl"
+
+querydsl {
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
+
+sourceSets {
+	main.java.srcDir querydslDir
+}
+
+configurations {
+	querydsl.extendsFrom compileClasspath
+}
+
+compileQuerydsl {
+	options.annotationProcessorPath = configurations.querydsl
+}
+//#endregion ======== querydsl ========
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
