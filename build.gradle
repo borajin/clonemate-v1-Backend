@@ -1,5 +1,5 @@
 plugins {
-	id 'org.springframework.boot' version '2.6.5'
+	id 'org.springframework.boot' version '2.5.7'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
 
@@ -9,7 +9,7 @@ plugins {
 
 group = 'com.1ndex'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '1.8'
+sourceCompatibility = '8'
 
 configurations {
 	compileOnly {
@@ -30,12 +30,17 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
+	//varidation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
 	//string 처리 관련 library
 	implementation 'org.apache.commons:commons-lang3'
 
+	//aop
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+
 	// querydsl 추가
 	implementation "com.querydsl:querydsl-jpa"
-	//implementation "com.querydsl:querydsl-apt" <-- 를 넣으면 duplicate class error 뜸.
 
 	annotationProcessor(
 			'org.projectlombok:lombok',
@@ -58,6 +63,9 @@ sourceSets {
 }
 
 configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
 	querydsl.extendsFrom compileClasspath
 }
 
