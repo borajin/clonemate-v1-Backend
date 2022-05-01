@@ -1,4 +1,4 @@
-package com.ndex.clonemate.user.domain.mapper;
+package com.ndex.clonemate.user.domain;
 
 public interface UserResponseMapping {
     Long getId();

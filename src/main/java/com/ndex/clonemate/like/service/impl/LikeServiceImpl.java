@@ -6,7 +6,7 @@ import com.ndex.clonemate.like.service.LikeService;
 import com.ndex.clonemate.todo.domain.Todo;
 import com.ndex.clonemate.todo.domain.repository.TodoRepository;
 import com.ndex.clonemate.user.domain.User;
-import com.ndex.clonemate.user.domain.repository.UserRepository;
+import com.ndex.clonemate.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

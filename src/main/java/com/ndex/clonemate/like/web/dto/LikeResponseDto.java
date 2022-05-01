@@ -1,6 +1,6 @@
 package com.ndex.clonemate.like.web.dto;
 
-import com.ndex.clonemate.user.domain.mapper.UserResponseMapping;
+import com.ndex.clonemate.user.domain.UserResponseMapping;
 
 public class LikeResponseDto {
     Long id;

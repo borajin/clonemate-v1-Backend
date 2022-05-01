@@ -7,7 +7,7 @@ import com.ndex.clonemate.goal.service.GoalService;
 import com.ndex.clonemate.goal.web.dto.GoalCreateRequestDto;
 import com.ndex.clonemate.goal.web.dto.GoalUpdateRequestDto;
 import com.ndex.clonemate.user.domain.User;
-import com.ndex.clonemate.user.domain.repository.UserRepository;
+import com.ndex.clonemate.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
