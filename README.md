@@ -1,5 +1,7 @@
 # clonemate-v1
 투두메이트(https://www.todomate.net/#/) 를 웹버전으로 클론코딩하는 프로젝트 입니다. 성능, 효율 상관 없이 평소 써보지 않은 기술, 관심있던 기술을 써보는 것에 의의를 두었습니다.
+- [프론트엔드 Github](https://github.com/kenna-hwa/clonemate-front)
+- 백엔드 Github
 
 ## 멤버
 - 프론트엔드 : [투토](https://github.com/sookm), [Kenna](https://github.com/kenna-hwa)
