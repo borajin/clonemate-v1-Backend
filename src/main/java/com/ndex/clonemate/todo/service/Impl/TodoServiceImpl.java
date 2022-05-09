@@ -14,14 +14,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.time.format.TextStyle;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
 
 @RequiredArgsConstructor
 @Service
@@ -39,44 +36,73 @@ public class TodoServiceImpl implements TodoService {
     }
 
     @Override
-    public List<TodayTodoListResponseDto> getTodos(Long userId, LocalDate date) {
-        //goal, 투두 한꺼번에 다 가져오려 했는데... 더 복잡할 듯 해서 아래처럼 구현함.
-        //goal, 투두, like, user 조회한다고 총 4번의 select 가 일어남.
-
+    public List<TodosResponseDto> getTodos(Long userId, LocalDate date) {
         List<GoalResponseMapping> goals = goalService.getGoals(userId);
-        List<TodoResponseMapping> todos = todoRepository.findByUser_IdAndStartRepeatDateLessThanEqualAndEndRepeatDateGreaterThanEqualOrderByCheckYnAscOrderNoAsc(TodoResponseMapping.class, userId, date, date);
+        List<TodoResponseMapping> todos = todoRepository.findByUser_IdAndDateOrderByCheckYnAscOrderNoAsc(TodoResponseMapping.class, userId, date);
 
-        List<TodayTodoListResponseDto> todayTodoList = new ArrayList<>();
-
-        //foreach 는 순서 보장. 새로운 object return x (java 도 그런지 모름)
+        HashMap<Long, List<TodoResponseMapping>> temp = new HashMap<>();
         goals.forEach(goal -> {
-            List<TodoResponseMapping> newTodos = new ArrayList<>();
+            temp.put(goal.getId(), new ArrayList<>());
+        });
 
-            todos.forEach(todo -> {
-                if (Objects.equals(todo.getGoalId(), goal.getId())) {
-                    DayOfWeek dayOfWeek = date.getDayOfWeek();
-                    String dayOfWeekText = dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.US).toUpperCase(Locale.ROOT);
+        todos.forEach(todo -> {
+            temp.get(todo.getGoalId()).add(todo);
+        });
 
-                    System.out.println(dayOfWeekText);
-                    if (todo.getRepeatDays().get(dayOfWeekText).equals("y")) {
-                        newTodos.add(todo);
-                    }
-                }
-            });
-
-            TodayTodoListResponseDto newTodayTodo = TodayTodoListResponseDto.builder().id(goal.getId())
+        List<TodosResponseDto> results = new ArrayList<>();
+        goals.forEach(goal -> {
+            results.add(TodosResponseDto.builder()
+                    .id(goal.getId())
+                    .title(goal.getTitle())
                     .orderNo(goal.getOrderNo())
                     .privacy(goal.getPrivacy())
                     .titleColor(goal.getTitleColor())
-                    .title(goal.getTitle())
-                    .todos(newTodos)
-                    .build();
-
-            todayTodoList.add(newTodayTodo);
+                    .todos(temp.get(goal.getId()))
+                    .build());
         });
 
-        return todayTodoList;
+        return results;
     }
+
+//    @Override
+//    public List<TodayTodoListResponseDto> getTodos(Long userId, LocalDate date) {
+//        //goal, 투두 한꺼번에 다 가져오려 했는데... 더 복잡할 듯 해서 아래처럼 구현함.
+//        //goal, 투두, like, user 조회한다고 총 4번의 select 가 일어남.
+//
+//        List<GoalResponseMapping> goals = goalService.getGoals(userId);
+//        List<TodoResponseMapping> todos = todoRepository.findByUser_IdAndStartRepeatDateLessThanEqualAndEndRepeatDateGreaterThanEqualOrderByCheckYnAscOrderNoAsc(TodoResponseMapping.class, userId, date, date);
+//
+//        List<TodayTodoListResponseDto> todayTodoList = new ArrayList<>();
+//
+//        //foreach 는 순서 보장. 새로운 object return x (java 도 그런지 모름)
+//        goals.forEach(goal -> {
+//            List<TodoResponseMapping> newTodos = new ArrayList<>();
+//
+//            todos.forEach(todo -> {
+//                if (Objects.equals(todo.getGoalId(), goal.getId())) {
+//                    DayOfWeek dayOfWeek = date.getDayOfWeek();
+//                    String dayOfWeekText = dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.US).toUpperCase(Locale.ROOT);
+//
+//                    System.out.println(dayOfWeekText);
+//                    if (todo.getRepeatDays().get(dayOfWeekText).equals("Y")) {
+//                        newTodos.add(todo);
+//                    }
+//                }
+//            });
+//
+//            TodayTodoListResponseDto newTodayTodo = TodayTodoListResponseDto.builder().id(goal.getId())
+//                    .orderNo(goal.getOrderNo())
+//                    .privacy(goal.getPrivacy())
+//                    .titleColor(goal.getTitleColor())
+//                    .title(goal.getTitle())
+//                    .todos(newTodos)
+//                    .build();
+//
+//            todayTodoList.add(newTodayTodo);
+//        });
+//
+//        return todayTodoList;
+//    }
 
     @Override
     public List<TodoOverviewResponseDto> getTodosOverview(Long userId, YearMonth dateYm) {

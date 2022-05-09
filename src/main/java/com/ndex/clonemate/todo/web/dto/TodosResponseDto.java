@@ -8,7 +8,7 @@ import java.util.List;
 
 @Getter
 @Builder
-public class TodayTodoListResponseDto {
+public class TodosResponseDto {
     Long id;
     Long orderNo;
     String title;

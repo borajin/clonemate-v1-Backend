@@ -18,9 +18,8 @@ import java.time.YearMonth;
 public class TodoController {
     private final TodoService todoService;
 
-    @GetMapping("/todolist")
-    public ApiResult<?> getTodos(CustomAuthenticationToken token, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
-        Long userId = token.getId();
+    @GetMapping
+    public ApiResult<?> getTodos(@RequestParam Long userId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         return ApiUtils.createSuccessApi(todoService.getTodos(userId, date));
     }
 
@@ -30,8 +29,7 @@ public class TodoController {
     }
 
     @GetMapping("/overview")
-    public ApiResult<?> getTodoOverview(CustomAuthenticationToken token, @RequestParam @DateTimeFormat(pattern = "yyyy-MM") YearMonth dateYm) {
-        Long userId = token.getId();
+    public ApiResult<?> getTodoOverview(@RequestParam Long userId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM") YearMonth dateYm) {
         return ApiUtils.createSuccessApi(todoService.getTodosOverview(userId, dateYm));
     }
 

@@ -11,7 +11,7 @@ import java.util.List;
 public interface TodoService {
     TodoResponseMapping getTodo(Long id);
 
-    List<TodayTodoListResponseDto> getTodos(Long userId, LocalDate date);
+    List<TodosResponseDto> getTodos(Long userId, LocalDate date);
 
     List<TodoOverviewResponseDto> getTodosOverview(Long userId, YearMonth dateYm);
 

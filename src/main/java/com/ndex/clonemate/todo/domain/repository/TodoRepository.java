@@ -11,5 +11,7 @@ public interface TodoRepository extends JpaRepository<Todo, Long>, TodoRepositor
     <T> Optional<T> findById(Class<T> type, Long id);
 
     //체크한 것은 아래로, order 순서대로 정렬
-    <T> List<T> findByUser_IdAndStartRepeatDateLessThanEqualAndEndRepeatDateGreaterThanEqualOrderByCheckYnAscOrderNoAsc(Class<T> type, Long userId, LocalDate todayStartdate, LocalDate totdyEndDate);
+    <T> List<T> findByUser_IdAndDateOrderByCheckYnAscOrderNoAsc(Class<T> type, Long userId, LocalDate date);
+    //<T> List<T> findByUser_IdAndStartRepeatDateLessThanEqualAndEndRepeatDateGreaterThanEqualOrderByCheckYnAscOrderNoAsc(Class<T> type, Long userId, LocalDate todayStartdate, LocalDate totdyEndDate);
+    <T> List<T> findByDate(Class<T> type, LocalDate date);
 }

@@ -14,7 +14,7 @@ public interface TodoResponseMapping {
     LocalDate getDate();
     LocalDate getStartRepeatDate();
     LocalDate getEndRepeatDate();
-    HashMap<String, String> getRepeatDays();
+    HashMap<String, Character> getRepeatDays();
     String getCheckYn();
     Set<LikeResponseMapping> getLikes();
 }
