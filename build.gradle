@@ -87,3 +87,8 @@ compileQuerydsl {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+bootJar {
+	archivesBaseName='clonetodo-backend'
+	archiveFileName='clonetodo-backend-1.0.0.jar'
+}
