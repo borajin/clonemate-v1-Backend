@@ -9,5 +9,5 @@ import java.time.LocalDate;
 @Getter
 public class TodosCondition {
     private LocalDate date;
-    private String checkYn;
+    private Character checkYn;
 }

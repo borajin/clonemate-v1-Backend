@@ -25,37 +25,29 @@ public class TodoCreateRequestDto {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate endRepeatDate;
 
-    @Size(max = 1)
-    @Pattern(regexp = "[YX]")
-    private String repeatMonYn;
+    @Pattern(regexp = "[YN]")
+    private Character repeatMonYn;
 
-    @Size(max = 1)
-    @Pattern(regexp = "[YX]")
-    private String repeatTueYn;
+    @Pattern(regexp = "[YN]")
+    private Character repeatTueYn;
 
-    @Size(max = 1)
-    @Pattern(regexp = "[YX]")
-    private String repeatWenYn;
+    @Pattern(regexp = "[YN]")
+    private Character repeatWenYn;
 
-    @Size(max = 1)
-    @Pattern(regexp = "[YX]")
-    private String repeatThuYn;
+    @Pattern(regexp = "[YN]")
+    private Character repeatThuYn;
 
-    @Size(max = 1)
-    @Pattern(regexp = "[YX]")
-    private String repeatFriYn;
+    @Pattern(regexp = "[YN]")
+    private Character repeatFriYn;
 
-    @Size(max = 1)
-    @Pattern(regexp = "[YX]")
-    private String repeatSatYn;
+    @Pattern(regexp = "[YN]")
+    private Character repeatSatYn;
 
-    @Size(max = 1)
-    @Pattern(regexp = "[YX]")
-    private String repeatSunYn;
+    @Pattern(regexp = "[YN]")
+    private Character repeatSunYn;
 
-    @Size(max = 1)
-    @Pattern(regexp = "[YX]")
-    private String checkYn;
+    @Pattern(regexp = "[YN]")
+    private Character checkYn;
 
     public Todo toEntity(User user, Goal goal) {
         return Todo.builder()
@@ -74,7 +66,6 @@ public class TodoCreateRequestDto {
                 .repeatFriYn(repeatFriYn)
                 .repeatSatYn(repeatSatYn)
                 .repeatSunYn(repeatSunYn)
-                .checkYn(checkYn)
                 .build();
     }
 }

@@ -1,4 +1,4 @@
-package com.ndex.clonemate.today.controller.dto;
+package com.ndex.clonemate.todo.web.dto;
 
 import com.ndex.clonemate.todo.domain.mapper.TodoResponseMapping;
 import lombok.Builder;

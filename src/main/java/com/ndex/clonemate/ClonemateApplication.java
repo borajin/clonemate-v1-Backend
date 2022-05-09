@@ -10,11 +10,9 @@ public class ClonemateApplication {
 
 	public static void main(String[] args) {
 		try {
-
 			SpringApplication.run(ClonemateApplication.class, args);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-
 }

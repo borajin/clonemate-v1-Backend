@@ -3,14 +3,17 @@ package com.ndex.clonemate.user.web;
 import com.ndex.clonemate.user.service.UserService;
 import com.ndex.clonemate.user.web.dto.UserRegisterRequestDto;
 import com.ndex.clonemate.user.web.dto.UserUpdateRequestDto;
+import com.ndex.clonemate.utils.ApiResult;
+import com.ndex.clonemate.utils.ApiUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -20,36 +23,38 @@ public class UserController {
 
     //// 사용자 회원가입 ////
     @PostMapping("/users")
-    public ResponseEntity<?> register(@RequestBody UserRegisterRequestDto requestDto) {
-        return userService.register(requestDto);
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResult<?> register(@RequestBody UserRegisterRequestDto requestDto) {
+        return ApiUtils.createSuccessApi(userService.register(requestDto));
     }
 
     //// 사용자 정보 관련 ////
     @GetMapping("/users/{id}")
-    public ResponseEntity<?> myPage(@PathVariable(name = "id") Long id) {
-        return userService.findByUserId(id);
+    public ApiResult<?> myPage(@PathVariable(name = "id") Long id) {
+        return ApiUtils.createSuccessApi(userService.findByUserId(id));
     }
 
     @DeleteMapping("/users/{id}")
-    public ResponseEntity<?> delete(@PathVariable(name = "id") Long id) {
-        return userService.delete(id);
+    public ApiResult<?> delete(@PathVariable(name = "id") Long id) {
+        userService.delete(id);
+        return ApiUtils.createSuccessEmptyApi();
     }
 
     @PatchMapping("/users/{id}")
-    public ResponseEntity<?> update(@RequestBody UserUpdateRequestDto userUpdateRequestDto,
-                                    @PathVariable(name = "id") Long id) {
-        return userService.update(id, userUpdateRequestDto);
+    public ApiResult<?> update(@RequestBody UserUpdateRequestDto userUpdateRequestDto,
+                               @PathVariable(name = "id") Long id) {
+        userService.update(id, userUpdateRequestDto);
+        return ApiUtils.createSuccessEmptyApi();
     }
 
     //// 사용자 중복 체크 ////
     @GetMapping("/users/email/{email}")
-    public ResponseEntity<?> findUserByEmail(@PathVariable String email) {
-        return userService.findUserByEmail(email);
+    public ApiResult<?> haveUserByEmail(@PathVariable String email) {
+        return ApiUtils.createSuccessApi(userService.haveUserByEmail(email));
     }
 
     @GetMapping("/users/account/{account}")
-    public ResponseEntity<?> findUserByAccount(@PathVariable String account) {
-        return userService.findUserByAccount(account);
+    public ApiResult<?> haveUserByAccount(@PathVariable String account) {
+        return ApiUtils.createSuccessApi(userService.haveUserByAccount(account));
     }
-
 }

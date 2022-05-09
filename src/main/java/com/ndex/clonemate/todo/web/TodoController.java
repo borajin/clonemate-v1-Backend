@@ -1,17 +1,16 @@
 package com.ndex.clonemate.todo.web;
 
-import com.ndex.clonemate.todo.domain.mapper.TodoResponseMapping;
+import com.ndex.clonemate.certificate.model.CustomAuthenticationToken;
 import com.ndex.clonemate.todo.service.TodoService;
 import com.ndex.clonemate.todo.web.dto.*;
 import com.ndex.clonemate.utils.ApiResult;
+import com.ndex.clonemate.utils.ApiUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.List;
 
 @RequiredArgsConstructor
 @RequestMapping("/todos")
@@ -19,108 +18,57 @@ import java.util.List;
 public class TodoController {
     private final TodoService todoService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getTodo(@PathVariable("id") Long id) {
-        try {
-            TodoResponseMapping data = todoService.getTodo(id);
-            ApiResult<TodoResponseMapping> response = ApiResult.<TodoResponseMapping>builder().success(true).data(data).build();
-            return ResponseEntity.ok().body(response);
-        } catch (Exception e) {
-            ApiResult<TodoResponseMapping> response = ApiResult.<TodoResponseMapping>builder().success(false).errorMessage(e.getMessage()).build();
-            return ResponseEntity.badRequest().body(response);
-        }
+    @GetMapping("/todolist")
+    public ApiResult<?> getTodos(CustomAuthenticationToken token, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+        Long userId = token.getId();
+        return ApiUtils.createSuccessApi(todoService.getTodos(userId, date));
     }
 
-    @GetMapping
-    public ResponseEntity<?> getTodos(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
-        try {
-            List<TodoResponseMapping> data = todoService.getTodos(1L, date);
-            ApiResult<List<TodoResponseMapping>> response = ApiResult.<List<TodoResponseMapping>>builder().success(true).data(data).build();
-            return ResponseEntity.ok().body(response);
-        } catch (Exception e) {
-            ApiResult<List<TodoResponseMapping>> response = ApiResult.<List<TodoResponseMapping>>builder().success(false).errorMessage(e.getMessage()).build();
-            return ResponseEntity.badRequest().body(response);
-        }
+    @GetMapping("/{id}")
+    public ApiResult<?> getTodo(@PathVariable("id") Long id) {
+        return ApiUtils.createSuccessApi(todoService.getTodo(id));
     }
 
     @GetMapping("/overview")
-    public ResponseEntity<?> getTodoOverview(@RequestParam @DateTimeFormat(pattern = "yyyy-MM") YearMonth dateYm) {
-        try {
-            List<TodoOverviewResponseDto> data = todoService.getTodosOverview(1L, dateYm);
-
-            ApiResult<List<TodoOverviewResponseDto>> response = ApiResult.<List<TodoOverviewResponseDto>>builder().success(true).data(data).build();
-            return ResponseEntity.ok().body(response);
-        } catch (Exception e) {
-            ApiResult<List<TodoOverviewResponseDto>> response = ApiResult.<List<TodoOverviewResponseDto>>builder().success(false).errorMessage(e.getMessage()).build();
-            return ResponseEntity.badRequest().body(response);
-        }
+    public ApiResult<?> getTodoOverview(CustomAuthenticationToken token, @RequestParam @DateTimeFormat(pattern = "yyyy-MM") YearMonth dateYm) {
+        Long userId = token.getId();
+        return ApiUtils.createSuccessApi(todoService.getTodosOverview(userId, dateYm));
     }
 
     @PostMapping
-    public ResponseEntity<?> createTodo(@RequestBody TodoCreateRequestDto params) {
-        try {
-            todoService.createTodo(1L, params);
-
-            ApiResult<TodoResponseMapping> response = ApiResult.<TodoResponseMapping>builder().success(true).build();
-            return ResponseEntity.ok().body(response);
-        } catch (Exception e) {
-            ApiResult<TodoResponseMapping> response = ApiResult.<TodoResponseMapping>builder().success(false).errorMessage(e.getMessage()).build();
-            return ResponseEntity.badRequest().body(response);
-        }
+    public ApiResult<?> createTodo(CustomAuthenticationToken token, @RequestBody TodoCreateRequestDto params) {
+        Long userId = token.getId();
+        todoService.createTodo(userId, params);
+        return ApiUtils.createSuccessEmptyApi();
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateTodo(@PathVariable("id") Long id, @RequestBody TodoUpdateRequestDto params) {
-        try {
-            todoService.updateTodo(id, params);
-
-            ApiResult<TodoResponseMapping> response = ApiResult.<TodoResponseMapping>builder().success(true).build();
-            return ResponseEntity.ok().body(response);
-        } catch (Exception e) {
-            ApiResult<TodoResponseMapping> response = ApiResult.<TodoResponseMapping>builder().success(false).errorMessage(e.getMessage()).build();
-            return ResponseEntity.badRequest().body(response);
-        }
+    public ApiResult<?> updateTodo(@PathVariable("id") Long id, @RequestBody TodoUpdateRequestDto params) {
+        todoService.updateTodo(id, params);
+        return ApiUtils.createSuccessEmptyApi();
     }
 
     @PatchMapping
-    public ResponseEntity<?> updateTodos(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date, @RequestParam String checkYn, @RequestBody TodoUpdateRequestDto params) {
-        try {
-            TodosCondition condition = TodosCondition.builder().date(date).checkYn(checkYn).build();
-            todoService.updateTodos(1L, condition, params);
-
-            ApiResult<TodoResponseMapping> response = ApiResult.<TodoResponseMapping>builder().success(true).build();
-            return ResponseEntity.ok().body(response);
-        } catch (Exception e) {
-            ApiResult<TodoResponseMapping> response = ApiResult.<TodoResponseMapping>builder().success(false).errorMessage(e.getMessage()).build();
-            return ResponseEntity.badRequest().body(response);
-        }
+    public ApiResult<?> updateTodos(CustomAuthenticationToken token, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date, @RequestParam Character checkYn, @RequestBody TodoUpdateRequestDto params) {
+        Long userId = token.getId();
+        TodosCondition condition = TodosCondition.builder().date(date).checkYn(checkYn).build();
+        todoService.updateTodos(userId, condition, params);
+        return ApiUtils.createSuccessEmptyApi();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTodo(@PathVariable("id") Long id) {
-        try {
-            todoService.deleteTodo(id);
+    public ApiResult<?> deleteTodo(@PathVariable("id") Long id) {
+        todoService.deleteTodo(id);
+        return ApiUtils.createSuccessEmptyApi();
 
-            ApiResult<TodoResponseMapping> response = ApiResult.<TodoResponseMapping>builder().success(true).build();
-            return ResponseEntity.ok().body(response);
-        } catch (Exception e) {
-            ApiResult<TodoResponseMapping> response = ApiResult.<TodoResponseMapping>builder().success(false).errorMessage(e.getMessage()).build();
-            return ResponseEntity.badRequest().body(response);
-        }
     }
 
     //특정 날짜 미완료 or 전체 투두 삭제
     @DeleteMapping
-    public ResponseEntity<?> deleteTodos(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date, @RequestParam String checkYn) {
-        try {
-            TodosCondition condition = TodosCondition.builder().date(date).checkYn(checkYn).build();
-            todoService.deleteTodos(1L, condition);
-
-            ApiResult<TodoResponseMapping> response = ApiResult.<TodoResponseMapping>builder().success(true).build();
-            return ResponseEntity.ok().body(response);
-        } catch (Exception e) {
-            ApiResult<TodoResponseMapping> response = ApiResult.<TodoResponseMapping>builder().success(false).errorMessage(e.getMessage()).build();
-            return ResponseEntity.badRequest().body(response);
-        }
+    public ApiResult<?> deleteTodos(CustomAuthenticationToken token, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date, @RequestParam Character checkYn) {
+        Long userId = token.getId();
+        TodosCondition condition = TodosCondition.builder().date(date).checkYn(checkYn).build();
+        todoService.deleteTodos(userId, condition);
+        return ApiUtils.createSuccessEmptyApi();
     }
 }

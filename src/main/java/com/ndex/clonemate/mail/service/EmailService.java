@@ -5,7 +5,6 @@ import com.ndex.clonemate.certificate.model.RedisSession;
 import com.ndex.clonemate.mail.web.dto.UserPasswordRequestDto;
 import com.ndex.clonemate.user.domain.User;
 import com.ndex.clonemate.user.domain.UserRepository;
-import com.ndex.clonemate.utils.ApiUtils;
 import com.ndex.clonemate.utils.JwtTokenUtils;
 import com.ndex.clonemate.utils.MailUtils;
 import com.ndex.clonemate.utils.StringUtils;
@@ -16,7 +15,6 @@ import java.time.LocalDateTime;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -47,96 +45,60 @@ public class EmailService {
     private final MailUtils mailUtils;
     private final JwtTokenUtils tokenUtils;
 
-    @Transactional
-    public ResponseEntity<?> sendResetPasswordMail(long id) {
-        try {
-            MailRequestDto mailRequestDTO = new MailRequestDto();
+    public String sendCertifyMail(long id) {
+        MailRequestDto mailRequestDTO = MailRequestDto.builder()
+                .email(findUser(id).getEmail())
+                .build();
 
-            String key = StringUtils.generateRandomString(KEY_LENGTH);
+        String key = StringUtils.generateRandomString(KEY_LENGTH);
+        RedisSession redisSession = new RedisSession(id, key);
+        redisRepository.save(redisSession);
 
-            RedisSession redisSession = findRedis(id);
-            redisSession.setKey(key);
-            redisSession.setUpdatedAt(LocalDateTime.now());
+        String token = tokenUtils.createToken(String.valueOf(id), issuer, key, ttlMillis);
+        mailRequestDTO.writeResetPasswordMail(String.format(URL_FORMAT, certifyUrl, token, id));
+        mailUtils.send(mailRequestDTO);
 
-            String token = tokenUtils.createToken(String.valueOf(id), issuer, key, ttlMillis);
-            mailRequestDTO.writeResetPasswordMail(String.format(URL_FORMAT, resetUrl, token, id));
-            mailUtils.send(mailRequestDTO);
-
-            return ResponseEntity.ok()
-                    .body(ApiUtils.createSuccessEmptyApi());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.ok()
-                    .body(ApiUtils.createFailedApi(e));
-        }
+        return token;
     }
 
     @Transactional
-    public ResponseEntity<?> changePassword(UserPasswordRequestDto requestDto) {
-        try {
-            validationToken(requestDto.getId(), requestDto.getToken());
+    public void checkCertifyMail(long id, String token) {
+        validationToken(id, token);
 
-            User entity = findUser(requestDto.getId());
-            String encodeInputPassword = encoder.encode(requestDto.getOriginPassword());
-
-            if (!entity.getPassword().equals(encodeInputPassword)) {
-                throw new IllegalArgumentException(ERROR_PASSWORD_INCORRECT);
-            }
-
-            entity.changePassword(requestDto.getOriginPassword());
-            entity.encodePassword(encoder);
-
-            return ResponseEntity.ok()
-                    .body(ApiUtils.createSuccessEmptyApi());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.ok()
-                    .body(ApiUtils.createFailedApi(e));
-        }
-    }
-
-    public ResponseEntity<?> sendCertifyMail(long id) {
-        try {
-            MailRequestDto mailRequestDTO = MailRequestDto.builder()
-                    .email(findUser(id).getEmail())
-                    .build();
-
-            String key = StringUtils.generateRandomString(KEY_LENGTH);
-            RedisSession redisSession = new RedisSession(id, key);
-            redisRepository.save(redisSession);
-
-            String token = tokenUtils.createToken(String.valueOf(id), issuer, key, ttlMillis);
-            mailRequestDTO.writeResetPasswordMail(String.format(URL_FORMAT, certifyUrl, token, id));
-            mailUtils.send(mailRequestDTO);
-
-            return ResponseEntity.ok()
-                    .body(ApiUtils.createSuccessEmptyApi());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.ok()
-                    .body(ApiUtils.createFailedApi(e));
-        }
+        User entity = findUser(id);
+        entity.changeCertifyFlag();
     }
 
     @Transactional
-    public ResponseEntity<?> checkCertifyMail(long id, String token) {
-        try {
-            validationToken(id, token);
+    public String sendResetPasswordMail(long id) {
+        MailRequestDto mailRequestDTO = new MailRequestDto();
 
-            User entity = findUser(id);
-            entity.changeCertifyFlag();
+        String key = StringUtils.generateRandomString(KEY_LENGTH);
 
-            return ResponseEntity.ok()
-                    .body(ApiUtils.createSuccessEmptyApi());
+        RedisSession redisSession = findRedis(id);
+        redisSession.setKey(key);
+        redisSession.setUpdatedAt(LocalDateTime.now());
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.ok()
-                    .body(ApiUtils.createFailedApi(e));
+        String token = tokenUtils.createToken(String.valueOf(id), issuer, key, ttlMillis);
+        mailRequestDTO.writeResetPasswordMail(String.format(URL_FORMAT, resetUrl, token, id));
+        mailUtils.send(mailRequestDTO);
+
+        return token;
+    }
+
+    @Transactional
+    public void changePassword(UserPasswordRequestDto requestDto) {
+        validationToken(requestDto.getId(), requestDto.getToken());
+
+        User entity = findUser(requestDto.getId());
+        String encodeInputPassword = encoder.encode(requestDto.getOriginPassword());
+
+        if (!entity.getPassword().equals(encodeInputPassword)) {
+            throw new IllegalArgumentException(ERROR_PASSWORD_INCORRECT);
         }
+
+        entity.changePassword(requestDto.getOriginPassword());
+        entity.encodePassword(encoder);
     }
 
     public RedisSession findRedis(long id) {

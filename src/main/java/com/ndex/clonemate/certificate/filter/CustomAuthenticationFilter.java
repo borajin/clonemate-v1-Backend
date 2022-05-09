@@ -22,9 +22,6 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException, IOException {
-        if (!isAjax(request)) {
-            throw new IllegalStateException("지원되지 않는 방식의 인증 요청");
-        }
 
         CertificateDto certificateDTO = objectMapper.readValue(request.getReader(), CertificateDto.class);
         String account = certificateDTO.getAccount();
@@ -35,9 +32,5 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
         }
 
         return getAuthenticationManager().authenticate(new CustomAuthenticationToken(account, password));
-    }
-
-    private boolean isAjax(HttpServletRequest request) {
-        return "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
     }
 }

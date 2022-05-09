@@ -11,10 +11,10 @@ public class ApiUtils {
                 .build();
     }
 
-    public static ApiResult<Long> createFailedApi(Exception e) {
-        return ApiResult.<Long>builder()
-                .success(false)
-                .errorMessage(e.getMessage())
+    public static <T> ApiResult<T> createSuccessApi(T t) {
+        return ApiResult.<T>builder()
+                .success(true)
+                .data(t)
                 .build();
     }
 }

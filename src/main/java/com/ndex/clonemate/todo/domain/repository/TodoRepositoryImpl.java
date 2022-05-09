@@ -70,7 +70,7 @@ public class TodoRepositoryImpl implements TodoRepositoryCustom {
         //"SELECT DAY(todo.date),COUNT(todo.id), CASE WHEN SUM(CASE WHEN todo.checkYn = 'y' THEN 0 ELSE 1 END) = 0 THEN 'y' ELSE 'n' END FROM Todo todo WHERE todo.user.getId() = 1 AND SUBSTRING(todo.date, 1, 7) = '"+ dateYm +"' GROUP BY todo.id";
 
         NumberExpression<Integer> isAllTodoCheckedCountCase = new CaseBuilder()
-                .when(todo.checkYn.eq("y")).then(0)
+                .when(todo.checkYn.eq('Y')).then(0)
                 .otherwise(1);
 
         StringExpression isAllTodoCheckedYnCase = new CaseBuilder()
@@ -144,8 +144,8 @@ public class TodoRepositoryImpl implements TodoRepositoryCustom {
         return todo.endRepeatDate.year().eq(dateYm.getYear()).and(todo.endRepeatDate.month().eq(dateYm.getMonthValue()));
     }
 
-    private BooleanExpression eqCheckYn(String checkYn) {
-        if (StringUtils.isNoneEmpty(checkYn)) return null;
+    private BooleanExpression eqCheckYn(Character checkYn) {
+        if (checkYn == null) return null;
         return todo.checkYn.eq(checkYn);
     }
 
@@ -158,19 +158,19 @@ public class TodoRepositoryImpl implements TodoRepositoryCustom {
 
         switch (dayOfWeek) {
             case 1:
-                return todo.repeatMonYn.eq("y");
+                return todo.repeatMonYn.eq('Y');
             case 2:
-                return todo.repeatTueYn.eq("y");
+                return todo.repeatTueYn.eq('Y');
             case 3:
-                return todo.repeatWenYn.eq("y");
+                return todo.repeatWenYn.eq('Y');
             case  4:
-                return todo.repeatThuYn.eq("y");
+                return todo.repeatThuYn.eq('Y');
             case 5 :
-                return todo.repeatFriYn.eq("y");
+                return todo.repeatFriYn.eq('Y');
             case 6 :
-                return todo.repeatSatYn.eq("y");
+                return todo.repeatSatYn.eq('Y');
             default:
-                return todo.repeatSunYn.eq("y");
+                return todo.repeatSunYn.eq('Y');
         }
     }
 }

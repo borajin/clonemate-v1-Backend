@@ -11,7 +11,7 @@ import java.util.List;
 public interface TodoService {
     TodoResponseMapping getTodo(Long id);
 
-    List<TodoResponseMapping> getTodos(Long userId, LocalDate date);
+    List<TodayTodoListResponseDto> getTodos(Long userId, LocalDate date);
 
     List<TodoOverviewResponseDto> getTodosOverview(Long userId, YearMonth dateYm);
 
@@ -24,4 +24,5 @@ public interface TodoService {
     void deleteTodo(Long id);
 
     void deleteTodos(Long userId, TodosCondition condition);
+
 }

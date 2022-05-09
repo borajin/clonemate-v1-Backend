@@ -2,8 +2,9 @@ package com.ndex.clonemate.mail.web;
 
 import com.ndex.clonemate.mail.service.EmailService;
 import com.ndex.clonemate.mail.web.dto.UserPasswordRequestDto;
+import com.ndex.clonemate.utils.ApiResult;
+import com.ndex.clonemate.utils.ApiUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -16,22 +17,26 @@ public class EmailController {
     private final EmailService emailService;
 
     @GetMapping("/users/email/certify/{id}")
-    public ResponseEntity<?> sendCertifyMail(@PathVariable long id) {
-        return emailService.sendCertifyMail(id);
+    public ApiResult<?> sendCertifyMail(@PathVariable long id) {
+        String token = emailService.sendCertifyMail(id);
+        return ApiUtils.createSuccessApi(token);
     }
 
     @GetMapping("/users/email/{id}/{token}")
-    public ResponseEntity<?> checkCertifyMail(@PathVariable Long id, @PathVariable String token) {
-        return emailService.checkCertifyMail(id, token);
+    public ApiResult<?> checkCertifyMail(@PathVariable Long id, @PathVariable String token) {
+        emailService.checkCertifyMail(id, token);
+        return ApiUtils.createSuccessEmptyApi();
     }
 
     @GetMapping("/users/email/reset/{id}")
-    public ResponseEntity<?> sendResetPasswordMail(@PathVariable long id) {
-        return emailService.sendResetPasswordMail(id);
+    public ApiResult<?> sendResetPasswordMail(@PathVariable long id) {
+        String token = emailService.sendResetPasswordMail(id);
+        return ApiUtils.createSuccessApi(token);
     }
 
     @PutMapping("/users/email/password")
-    public ResponseEntity<?> changePassword(@RequestBody UserPasswordRequestDto request) {
-        return emailService.changePassword(request);
+    public ApiResult<?> changePassword(@RequestBody UserPasswordRequestDto request) {
+        emailService.changePassword(request);
+        return ApiUtils.createSuccessEmptyApi();
     }
 }

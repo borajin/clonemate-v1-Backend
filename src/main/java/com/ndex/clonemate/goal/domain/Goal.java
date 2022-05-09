@@ -21,22 +21,21 @@ public class Goal {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(nullable = false)
     private User user;
 
-    @Column(name = "order_no", nullable = false)
+    @Column(nullable = false)
     private Long orderNo;
 
     @Column(nullable = false)
     private String title;
 
-    //목표 공개 범위 전체공개(PUB), 일부공개(FOL), 나만보기(PRI), 숨기기(HID)
     @Enumerated(EnumType.STRING)    //EnumType.STRING 을 하면 ENUM NAME 그대로 저장됨 (안붙이면 정수형 숫자가 저장됨)
-    @Column(length = 500, nullable = false)
+    @Column(length = 8, nullable = false)
     private PrivacyType privacy;
 
     // #(1) + rgb(6) 색상코드
-    @Column(name = "title_color", length = 7, nullable = false)
+    @Column(length = 7, nullable = false)
     private String titleColor;
 
     @Builder
@@ -48,7 +47,6 @@ public class Goal {
         this.titleColor = titleColor;
     }
 
-    //COMPLETE : 부분 업데이트 이렇게 Null 검사하는 게 효율적인지 알아보기.. -> 연로그님 답변으론 ㄱㅊ다 했음.
     public void update(GoalUpdateRequestDto params) {
         if (params.getTitle() != null) this.title = params.getTitle();
         if (params.getPrivacy() != null) this.privacy = PrivacyType.of(params.getPrivacy());

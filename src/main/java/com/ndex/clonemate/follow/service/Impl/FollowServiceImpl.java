@@ -34,6 +34,7 @@ public class FollowServiceImpl implements FollowService {
     @Override
     @Transactional
     public void follow(Long userId, Long followId) {
+        //TODO : user, follower 를 find 해서 Follow 에 넣어주는 게 맞는지...
         User user = userRepository.findById(User.class, userId).orElseThrow(() -> new IllegalArgumentException(ERROR_NO_USER + "id : " + userId));
         User follower = userRepository.findById(User.class, followId).orElseThrow(() -> new IllegalArgumentException(ERROR_NO_USER + "id : " + followId));
 

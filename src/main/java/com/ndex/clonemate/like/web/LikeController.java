@@ -1,38 +1,29 @@
 package com.ndex.clonemate.like.web;
 
+import com.ndex.clonemate.certificate.model.CustomAuthenticationToken;
 import com.ndex.clonemate.like.service.LikeService;
 import com.ndex.clonemate.utils.ApiResult;
+import com.ndex.clonemate.utils.ApiUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
-@RequestMapping("/like")
+@RequestMapping("/likes")
 @RestController
 public class LikeController {
     private final LikeService likeService;
 
     @PostMapping("/{id}")
-    public ResponseEntity<?> like(@PathVariable("id") Long todoId) {
-        try {
-            likeService.like(todoId, 1L);
-            ApiResult<String> response = ApiResult.<String>builder().success(true).build();
-            return ResponseEntity.ok().body(response);
-        } catch (Exception e) {
-            ApiResult<String> response = ApiResult.<String>builder().success(false).errorMessage(e.getMessage()).build();
-            return ResponseEntity.badRequest().body(response);
-        }
+    public ApiResult<?> like(CustomAuthenticationToken token, @PathVariable("id") Long todoId) {
+        Long userId = token.getId();
+        likeService.like(todoId, userId);
+        return ApiUtils.createSuccessEmptyApi();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> unLike(@PathVariable("id") Long id) {
-        try {
-            likeService.unLike(id);
-            ApiResult<String> response = ApiResult.<String>builder().success(true).build();
-            return ResponseEntity.ok().body(response);
-        } catch (Exception e) {
-            ApiResult<String> response = ApiResult.<String>builder().success(false).errorMessage(e.getMessage()).build();
-            return ResponseEntity.badRequest().body(response);
-        }
+    public ApiResult<?> unLike(@PathVariable("id") Long id) {
+        likeService.unLike(id);
+        return ApiUtils.createSuccessEmptyApi();
     }
 }

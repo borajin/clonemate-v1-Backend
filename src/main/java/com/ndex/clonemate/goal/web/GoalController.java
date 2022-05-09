@@ -1,17 +1,16 @@
 package com.ndex.clonemate.goal.web;
 
+import com.ndex.clonemate.certificate.model.CustomAuthenticationToken;
 import com.ndex.clonemate.goal.domain.mapper.GoalResponseMapping;
 import com.ndex.clonemate.goal.service.GoalService;
 import com.ndex.clonemate.goal.web.dto.GoalCreateRequestDto;
 import com.ndex.clonemate.goal.web.dto.GoalUpdateRequestDto;
-import com.ndex.clonemate.todo.domain.mapper.TodoResponseMapping;
 import com.ndex.clonemate.utils.ApiResult;
+import com.ndex.clonemate.utils.ApiUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RequiredArgsConstructor
 @RequestMapping("/goals")
@@ -20,68 +19,31 @@ public class GoalController {
     private final GoalService goalService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getGoal(@PathVariable("id") Long id) {
-        try {
-            GoalResponseMapping data = goalService.getGoal(GoalResponseMapping.class, id);
-            ApiResult<GoalResponseMapping> response = ApiResult.<GoalResponseMapping>builder().success(true).data(data).build();
-
-            System.out.println("h23h23h23h");
-
-            return ResponseEntity.ok().body(response);
-        } catch (Exception e) {
-            ApiResult<String> response = ApiResult.<String>builder().success(false).errorMessage(e.getMessage()).build();
-            return ResponseEntity.badRequest().body(response);
-        }
+    public ApiResult<?> getGoal(@PathVariable("id") Long id) {
+        return ApiUtils.createSuccessApi(goalService.getGoal(GoalResponseMapping.class, id));
     }
 
     @GetMapping
-    public ResponseEntity<?> getGoalsAndTodos() {
-        try {
-            List<GoalResponseMapping> data = goalService.getGoals(1L);
-            ApiResult<List<GoalResponseMapping>> response = ApiResult.<List<GoalResponseMapping>>builder().success(true).data(data).build();
-            return ResponseEntity.ok().body(response);
-        } catch (Exception e) {
-            ApiResult<List<TodoResponseMapping>> response = ApiResult.<List<TodoResponseMapping>>builder().success(false).errorMessage(e.getMessage()).build();
-            return ResponseEntity.badRequest().body(response);
-        }
+    public ApiResult<?> getGoalsAndTodos() {
+        return ApiUtils.createSuccessApi(goalService.getGoals(1L));
     }
 
     @PostMapping
-    public ResponseEntity<?> createGoal(@Valid @RequestBody GoalCreateRequestDto params) {
-        try {
-            goalService.createGoal(1L, params);
-
-            ApiResult<String> response = ApiResult.<String>builder().success(true).build();
-            return ResponseEntity.ok().body(response);
-        } catch (Exception e) {
-            ApiResult<String> response = ApiResult.<String>builder().success(false).errorMessage(e.getMessage()).build();
-            return ResponseEntity.badRequest().body(response);
-        }
+    public ApiResult<?> createGoal(CustomAuthenticationToken token, @Valid @RequestBody GoalCreateRequestDto params) {
+        Long userId = token.getId();
+        goalService.createGoal(userId, params);
+        return ApiUtils.createSuccessEmptyApi();
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateGoal(@PathVariable("id") Long id, @Valid @RequestBody GoalUpdateRequestDto params) {
-        try {
-            goalService.updateGoal(id, params);
-
-            ApiResult<String> response = ApiResult.<String>builder().success(true).build();
-            return ResponseEntity.ok().body(response);
-        } catch (Exception e) {
-            ApiResult<String> response = ApiResult.<String>builder().success(false).errorMessage(e.getMessage()).build();
-            return ResponseEntity.badRequest().body(response);
-        }
+    public ApiResult<?> updateGoal(@PathVariable("id") Long id, @Valid @RequestBody GoalUpdateRequestDto params) {
+        goalService.updateGoal(id, params);
+        return ApiUtils.createSuccessEmptyApi();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteGoal(@PathVariable("id") Long id) {
-        try {
-            goalService.deleteGoal(id);
-
-            ApiResult<String> response = ApiResult.<String>builder().success(true).build();
-            return ResponseEntity.ok().body(response);
-        } catch (Exception e) {
-            ApiResult<String> response = ApiResult.<String>builder().success(false).errorMessage(e.getMessage()).build();
-            return ResponseEntity.badRequest().body(response);
-        }
+    public ApiResult<?> deleteGoal(@PathVariable("id") Long id) {
+        goalService.deleteGoal(id);
+        return ApiUtils.createSuccessEmptyApi();
     }
 }

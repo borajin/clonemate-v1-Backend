@@ -7,11 +7,9 @@ import com.ndex.clonemate.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.apache.tomcat.jni.Local;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,59 +33,48 @@ public class Todo {
     @JoinColumn(name = "goal_id")
     private Goal goal;
 
-    @OneToMany(mappedBy = "todo", cascade = CascadeType.ALL)   //외래키와 매핑되는 필드 명시
+    @OneToMany(mappedBy = "todo", cascade = CascadeType.ALL)
     private Set<Like> likes = new HashSet<>();
 
-    @Column(name = "order_no", nullable = false)
+    @Column(nullable = false)
     private Long orderNo;
 
     @Column(nullable = false)
     private String title;
 
-    //null = 등록 안함
     private LocalDate date;
 
-    @Column(name = "start_repeat_date",nullable = false)
     private LocalDate startRepeatDate;
 
-    @Column(name = "end_repeat_date", nullable = false)
     private LocalDate endRepeatDate;
 
-    @Size(max = 1)
-    @Column(name = "repeat_mon_yn", nullable = false)
-    private String repeatMonYn;
+    @Column(nullable = false)
+    private Character repeatMonYn;
 
-    @Size(max = 1)
-    @Column(name = "repeat_tue_yn", nullable = false)
-    private String repeatTueYn;
+    @Column(nullable = false)
+    private Character repeatTueYn;
 
-    @Size(max = 1)
-    @Column(name = "repeat_wen_yn", nullable = false)
-    private String repeatWenYn;
+    @Column(nullable = false)
+    private Character repeatWenYn;
 
-    @Size(max = 1)
-    @Column(name = "repeat_thu_yn", nullable = false)
-    private String repeatThuYn;
+    @Column(nullable = false)
+    private Character repeatThuYn;
 
-    @Size(max = 1)
-    @Column(name = "repeat_fri_yn", nullable = false)
-    private String repeatFriYn;
+    @Column(nullable = false)
+    private Character repeatFriYn;
 
-    @Size(max = 1)
-    @Column(name = "repeat_sat_yn", nullable = false)
-    private String repeatSatYn;
+    @Column(nullable = false)
+    private Character repeatSatYn;
 
-    @Size(max = 1)
-    @Column(name = "repeat_sun_yn", nullable = false)
-    private String repeatSunYn;
+    @Column(nullable = false)
+    private Character repeatSunYn;
 
-    @Size(max = 1)
-    @Column(name = "check_yn", nullable = false)
-    private String checkYn;   //oracle 에는 boolean 이 없음. 다른 db 호환 위해 char 형 사용하기)
+    @Column(nullable = false)
+    private Character checkYn;   //oracle 에는 boolean 이 없음. 다른 db 호환 위해 char 형 사용하기)
 
     //userId 를 생성하지 않기 위해 직접 빌더 만들어줌. (builder.default 로 따로 명시 안하면 기본값 0, null, false )
     @Builder
-    public Todo(User user, Goal goal, Long orderNo, String title, LocalDate date, LocalDate startRepeatDate, LocalDate endRepeatDate, String repeatMonYn, String repeatTueYn, String repeatWenYn, String repeatThuYn, String repeatFriYn, String repeatSatYn, String repeatSunYn, String checkYn) {
+    public Todo(User user, Goal goal, Long orderNo, String title, LocalDate date, LocalDate startRepeatDate, LocalDate endRepeatDate, Character repeatMonYn, Character repeatTueYn, Character repeatWenYn, Character repeatThuYn, Character repeatFriYn, Character repeatSatYn, Character repeatSunYn) {
         this.user = user;
         this.goal = goal;
         this.orderNo = orderNo;
@@ -102,7 +89,7 @@ public class Todo {
         this.repeatFriYn = repeatFriYn;
         this.repeatSatYn = repeatSatYn;
         this.repeatSunYn = repeatSunYn;
-        this.checkYn = checkYn;
+        this.checkYn = 'N';
     }
 
     public void update(TodoUpdateRequestDto params) {
@@ -120,7 +107,7 @@ public class Todo {
         if (params.getCheckYn() != null) this.checkYn = params.getCheckYn();
     }
 
-    public void updateOrder(Long orderNo) {
+    public void updateOrderNo(Long orderNo) {
         this.orderNo = orderNo;
     }
 
@@ -128,8 +115,8 @@ public class Todo {
         return this.goal.getId();
     }
 
-    public HashMap<String, String> getRepeatDays() {
-        HashMap<String, String> repeatDays = new HashMap<>();
+    public HashMap<String, Character> getRepeatDays() {
+        HashMap<String, Character> repeatDays = new HashMap<>();
         repeatDays.put("MON", this.repeatMonYn);
         repeatDays.put("TUE", this.repeatTueYn);
         repeatDays.put("WED", this.repeatWenYn);

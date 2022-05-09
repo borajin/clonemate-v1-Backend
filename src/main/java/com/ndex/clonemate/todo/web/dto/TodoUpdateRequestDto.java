@@ -5,13 +5,13 @@ import lombok.Builder;
 import lombok.Getter;
 
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
 @Getter
 @Builder
 public class TodoUpdateRequestDto {
     private Long goalId;
+
     private String title;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -23,35 +23,27 @@ public class TodoUpdateRequestDto {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate endRepeatDate;
 
-    @Size(max = 1)
-    @Pattern(regexp = "[YX]")
-    private String repeatMonYn;
+    @Pattern(regexp = "[YN]")
+    private Character repeatMonYn;
 
-    @Size(max = 1)
-    @Pattern(regexp = "[YX]")
-    private String repeatTueYn;
+    @Pattern(regexp = "[YN]")
+    private Character repeatTueYn;
 
-    @Size(max = 1)
-    @Pattern(regexp = "[YX]")
-    private String repeatWenYn;
+    @Pattern(regexp = "[YN]")
+    private Character repeatWenYn;
 
-    @Size(max = 1)
-    @Pattern(regexp = "[YX]")
-    private String repeatThuYn;
+    @Pattern(regexp = "[YN]")
+    private Character repeatThuYn;
 
-    @Size(max = 1)
-    @Pattern(regexp = "[YX]")
-    private String repeatFriYn;
+    @Pattern(regexp = "[YN]")
+    private Character repeatFriYn;
 
-    @Size(max = 1)
-    @Pattern(regexp = "[YX]")
-    private String repeatSatYn;
+    @Pattern(regexp = "[YN]")
+    private Character repeatSatYn;
 
-    @Size(max = 1)
-    @Pattern(regexp = "[YX]")
-    private String repeatSunYn;
+    @Pattern(regexp = "[YN]")
+    private Character repeatSunYn;
 
-    @Size(max = 1)
-    @Pattern(regexp = "[YX]")
-    private String checkYn;
+    @Pattern(regexp = "[YN]")
+    private Character checkYn;
 }
