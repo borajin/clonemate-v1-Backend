@@ -1,16 +1,16 @@
 package com.ndex.clonemate.goal.web.dto;
 
-import lombok.Builder;
+import com.ndex.clonemate.utils.CommonUtils;
 import lombok.Getter;
 
 import javax.validation.constraints.Pattern;
 
-@Builder
 @Getter
 public class GoalUpdateRequestDto {
-    private String title;
+
+    private String contents;
     private String privacy;
 
-    @Pattern(regexp = "^#(?:[0-9a-f]{2}){3}$")
-    private String titleColor;
+    @Pattern(regexp = CommonUtils.REGEXP_COLOR_CODE)
+    private String color;
 }

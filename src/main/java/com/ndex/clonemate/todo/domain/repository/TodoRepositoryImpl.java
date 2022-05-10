@@ -1,17 +1,20 @@
 package com.ndex.clonemate.todo.domain.repository;
 
+import com.ndex.clonemate.todo.domain.TFCode;
 import com.ndex.clonemate.todo.web.dto.TodoOverviewResponseDto;
-import com.ndex.clonemate.todo.web.dto.TodoUpdateRequestDto;
-import com.ndex.clonemate.todo.web.dto.TodosCondition;
-import com.querydsl.core.Tuple;
+import com.ndex.clonemate.todo.web.dto.TodoUpdateOrderAndGoalRequestDto;
+import com.ndex.clonemate.todo.web.dto.TodoUpdateWithoutOrderAndGoalRequestDto;
+import com.ndex.clonemate.todo.web.dto.TodoUpdateOrDeleteRequestDto;
+
+import com.ndex.clonemate.utils.CommonUtils;
 import com.querydsl.core.dml.UpdateClause;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.*;
-import com.querydsl.jpa.impl.JPAQuery;
+
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
+
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -24,30 +27,52 @@ import static com.ndex.clonemate.todo.domain.QTodo.todo;
 @RequiredArgsConstructor
 @Repository
 public class TodoRepositoryImpl implements TodoRepositoryCustom {
+
     private final JPAQueryFactory jpaQueryFactory;
     private final EntityManager entityManager;
 
     @Override
-    public void updateTodos(Long userId, TodosCondition condition, TodoUpdateRequestDto params) {
+    public List<TodoOverviewResponseDto> findTodoOverview(Long userId, YearMonth dateYm) {
+        //"SELECT DAY(todo.date),COUNT(todo.id), CASE WHEN SUM(CASE WHEN todo.checkYn = 'y' THEN 0 ELSE 1 END) = 0 THEN 'y' ELSE 'n' END FROM Todo todo WHERE todo.user.getId() = 1 AND SUBSTRING(todo.date, 1, 7) = '"+ dateYm +"' GROUP BY todo.id";
+
+        NumberExpression<Integer> isAllTodoCheckedCountCase = new CaseBuilder()
+            .when(todo.isChecked.eq(TFCode.TRUE)).then(0)
+            .otherwise(1);
+
+        BooleanExpression isAllTodoCheckedYnCase = new CaseBuilder()
+            .when(isAllTodoCheckedCountCase.sum().eq(0)).then(TFCode.TRUE.isBoolValue())
+            .otherwise(TFCode.FALSE.isBoolValue());
+
+        return jpaQueryFactory
+            .select(Projections.constructor(TodoOverviewResponseDto.class,
+                todo.date.dayOfMonth().as("numTodoDay"),
+                todo.id.count().as("numTodoCount"),
+                isAllTodoCheckedYnCase.as("isCompleted")))
+            .from(todo)
+            .where(
+                eqUserId(userId),
+                eqDateYm(dateYm)
+            )
+            .groupBy(todo.date)
+            .orderBy(todo.date.asc())
+            .fetch();
+    }
+
+    @Override
+    public void updateTodos(Long userId, TodoUpdateOrDeleteRequestDto condition,
+        TodoUpdateWithoutOrderAndGoalRequestDto params) {
         UpdateClause<JPAUpdateClause> updateBuilder = jpaQueryFactory.update(todo);
 
-        //일자 변경
-        if (params.getDate() != null) {
+        if (!CommonUtils.isEmpty(params.getDate())) {
             updateBuilder.set(todo.date, params.getDate());
         }
 
-        //반복일자변경
-        if(params.getEndRepeatDate() != null) {
-            updateBuilder.set(todo.endRepeatDate, params.getEndRepeatDate());
-        }
-
-        //condition 에 따라 어떤 투두를 바꿀지
         updateBuilder.where(
-                        eqUserId(userId),
-                        eqDate(condition.getDate()),
-                        eqCheckYn(condition.getCheckYn())
-                )
-                .execute();
+                eqUserId(userId),
+                eqDate(condition.getDate()),
+                eqIsChecked(condition.getIsChecked())
+            )
+            .execute();
 
         //영속성 유지
         entityManager.flush();
@@ -55,98 +80,71 @@ public class TodoRepositoryImpl implements TodoRepositoryCustom {
     }
 
     @Override
-    public void deleteTodos(Long userId, TodosCondition condition) {
-        jpaQueryFactory.delete(todo)
-                .where(eqUserId(userId),
-                        eqDate(condition.getDate()),
-                        eqCheckYn(condition.getCheckYn()))
-                .execute();
+    public void updateOrderOrGoal(Long userId, List<TodoUpdateOrderAndGoalRequestDto> params) {
+        //쿼리 생성
+        StringBuilder updateOrderQuery = new StringBuilder(
+            "UPDATE Todo SET ");
+        StringBuilder updateGoalIdQuery = new StringBuilder();
 
-        //TODO : 영속성 유지 해야하는지?
+        updateOrderQuery.append("order_no = CASE");
+        updateGoalIdQuery.append(", goal_id = CASE");
+
+        params.forEach(item -> {
+            updateOrderQuery.append(" WHEN id = ").append(item.getId()).append(" THEN ")
+                .append(item.getOrderNo());
+            updateGoalIdQuery.append(" WHEN id = ").append(item.getId()).append(" THEN ")
+                .append(item.getGoalId());
+        });
+
+        updateOrderQuery.append(" ELSE order_no END");
+        updateGoalIdQuery.append(" ELSE goal_id END");
+
+        updateOrderQuery.append(updateGoalIdQuery).append(" WHERE user_id = ").append(userId);
+
+        entityManager.createQuery(updateOrderQuery.toString())
+            .executeUpdate();
+
+        entityManager.flush();
+        entityManager.clear();
     }
 
     @Override
-    public List<TodoOverviewResponseDto> findTodoOverview(Long userId, YearMonth dateYm) {
-        //"SELECT DAY(todo.date),COUNT(todo.id), CASE WHEN SUM(CASE WHEN todo.checkYn = 'y' THEN 0 ELSE 1 END) = 0 THEN 'y' ELSE 'n' END FROM Todo todo WHERE todo.user.getId() = 1 AND SUBSTRING(todo.date, 1, 7) = '"+ dateYm +"' GROUP BY todo.id";
-
-        NumberExpression<Integer> isAllTodoCheckedCountCase = new CaseBuilder()
-                .when(todo.checkYn.eq('Y')).then(0)
-                .otherwise(1);
-
-        StringExpression isAllTodoCheckedYnCase = new CaseBuilder()
-                .when(isAllTodoCheckedCountCase.sum().eq(0)).then("y")
-                .otherwise("n");
-
-        List<TodoOverviewResponseDto> result = jpaQueryFactory
-                .select(Projections.constructor(TodoOverviewResponseDto.class,
-                        todo.date.dayOfMonth().as("numTodoDay"),
-                        todo.id.count().as("numTodoCount"),
-                        isAllTodoCheckedYnCase.as("ynComplete")))
-                .from(todo)
-                .where(
-                        eqUserId(userId),
-                        eqDateYm(dateYm)
-                )
-                .groupBy(todo.date)
-                .orderBy(todo.date.asc())
-                .fetch();
-
-        return result;
+    public void deleteTodos(Long userId, TodoUpdateOrDeleteRequestDto condition) {
+        jpaQueryFactory.delete(todo)
+            .where(eqUserId(userId),
+                eqDate(condition.getDate()),
+                eqIsChecked(condition.getIsChecked()))
+            .execute();
     }
 
-//    @Override
-//    public void updateOrder(Long userId, Long goalId, List<UpdateTodoOrderRequestDto> params) {
-//        //쿼리 생성
-//        StringBuilder updateOrderQuery = new StringBuilder("UPDATE Todo SET (order_no, goal_id) = (");
-//        StringBuilder updateGoalIdQuery = new StringBuilder();
-//
-//        for (int i = 0; i < params.size(); i++) {
-//            if (i == 0) {
-//                updateOrderQuery.append("CASE");
-//                updateGoalIdQuery.append(", CASE");
-//            }
-//
-//            updateOrderQuery.append(" WHEN todo_id = ").append(params.get(i).getId()).append(" THEN ").append(params.get(i).getOrderNo());
-//            updateGoalIdQuery.append("todo_id = ").append(params.get(i).getId()).append(" THEN ").append(params.get(i).getGoalId());
-//        }
-//        updateOrderQuery.append(" ELSE order_no END");
-//        updateGoalIdQuery.append(" ELSE goal_id END");
-//
-//        updateOrderQuery.append(updateGoalIdQuery).append(") WHERE user_id = ").append(userId);
-//
-//        //쿼리 실행. 두번쨰 인자는 반환 타입. update 문이므로 반환 x
-//        entityManager.createQuery(updateOrderQuery.toString())
-//                .executeUpdate();
-//
-//        //영속성 유지
-//        entityManager.flush();
-//        entityManager.clear();
-//    }
-
-    //아래는 where 조건을 동적으로 생성하기 위한 BooleanExpression 입니다.
     private BooleanExpression eqUserId(Long userId) {
-        if (userId == null) return null;
+        if (CommonUtils.isEmpty(userId)) {
+            return null;
+        }
         return todo.user.id.eq(userId);
     }
 
     private BooleanExpression eqDate(LocalDate date) {
-        if (date == null) return null;
+        if (CommonUtils.isEmpty(date)) {
+            return null;
+        }
         return todo.date.eq(date);
     }
 
     private BooleanExpression eqDateYm(YearMonth dateYm) {
-        if(dateYm == null) return null;
-        return todo.date.year().eq(dateYm.getYear()).and(todo.date.month().eq(dateYm.getMonthValue()));
+        if (CommonUtils.isEmpty(dateYm)) {
+            return null;
+        }
+        return todo.date.year().eq(dateYm.getYear())
+            .and(todo.date.month().eq(dateYm.getMonthValue()));
     }
 
-    private BooleanExpression eqEndRepeatDateYm(YearMonth dateYm) {
-        if(dateYm == null) return null;
-        return todo.endRepeatDate.year().eq(dateYm.getYear()).and(todo.endRepeatDate.month().eq(dateYm.getMonthValue()));
-    }
-
-    private BooleanExpression eqCheckYn(Character checkYn) {
-        if (checkYn == null) return null;
-        return todo.checkYn.eq(checkYn);
+    private BooleanExpression eqIsChecked(TFCode isChecked) {
+        System.out.println(todo.isChecked + "," + isChecked);
+        if (CommonUtils.isEmpty(isChecked)) {
+            return null;
+        }
+        return todo.isChecked.eq(isChecked);
     }
 
     private BooleanExpression beforeEndRepeatDate() {
@@ -158,19 +156,19 @@ public class TodoRepositoryImpl implements TodoRepositoryCustom {
 
         switch (dayOfWeek) {
             case 1:
-                return todo.repeatMonYn.eq('Y');
+                return todo.isRepeatMon.eq(TFCode.TRUE);
             case 2:
-                return todo.repeatTueYn.eq('Y');
+                return todo.isRepeatTue.eq(TFCode.TRUE);
             case 3:
-                return todo.repeatWenYn.eq('Y');
-            case  4:
-                return todo.repeatThuYn.eq('Y');
-            case 5 :
-                return todo.repeatFriYn.eq('Y');
-            case 6 :
-                return todo.repeatSatYn.eq('Y');
+                return todo.isRepeatWen.eq(TFCode.TRUE);
+            case 4:
+                return todo.isRepeatThu.eq(TFCode.TRUE);
+            case 5:
+                return todo.isRepeatFri.eq(TFCode.TRUE);
+            case 6:
+                return todo.isRepeatSat.eq(TFCode.TRUE);
             default:
-                return todo.repeatSunYn.eq('Y');
+                return todo.isRepeatSun.eq(TFCode.TRUE);
         }
     }
 }

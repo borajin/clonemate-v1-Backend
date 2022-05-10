@@ -16,34 +16,40 @@ import javax.validation.Valid;
 @RequestMapping("/goals")
 @RestController
 public class GoalController {
+
     private final GoalService goalService;
+
+    @GetMapping
+    public ApiResult<?> getGoals(CustomAuthenticationToken token) {
+        Long sessionUserId = token.getId();
+        return ApiUtils.createSuccessApi(goalService.getGoals(sessionUserId));
+    }
 
     @GetMapping("/{id}")
     public ApiResult<?> getGoal(@PathVariable("id") Long id) {
         return ApiUtils.createSuccessApi(goalService.getGoal(GoalResponseMapping.class, id));
     }
 
-    @GetMapping
-    public ApiResult<?> getGoalsAndTodos() {
-        return ApiUtils.createSuccessApi(goalService.getGoals(1L));
-    }
-
     @PostMapping
-    public ApiResult<?> createGoal(CustomAuthenticationToken token, @Valid @RequestBody GoalCreateRequestDto params) {
-        Long userId = token.getId();
-        goalService.createGoal(userId, params);
+    public ApiResult<?> createGoal(CustomAuthenticationToken token,
+        @Valid @RequestBody GoalCreateRequestDto params) {
+        Long sessionUserId = token.getId();
+        goalService.createGoal(sessionUserId, params);
         return ApiUtils.createSuccessEmptyApi();
     }
 
     @PatchMapping("/{id}")
-    public ApiResult<?> updateGoal(@PathVariable("id") Long id, @Valid @RequestBody GoalUpdateRequestDto params) {
-        goalService.updateGoal(id, params);
+    public ApiResult<?> updateGoal(CustomAuthenticationToken token,@PathVariable("id") Long id,
+        @Valid @RequestBody GoalUpdateRequestDto params) {
+        Long sessionUserId = token.getId();
+        goalService.updateGoal(sessionUserId, id, params);
         return ApiUtils.createSuccessEmptyApi();
     }
 
     @DeleteMapping("/{id}")
-    public ApiResult<?> deleteGoal(@PathVariable("id") Long id) {
-        goalService.deleteGoal(id);
+    public ApiResult<?> deleteGoal(CustomAuthenticationToken token,@PathVariable("id") Long id) {
+        Long sessionUserId = token.getId();
+        goalService.deleteGoal(sessionUserId, id);
         return ApiUtils.createSuccessEmptyApi();
     }
 }

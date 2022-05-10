@@ -6,10 +6,10 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 
-//반드시 구현체 이름 끝에는 Impl 가 있어야 함.
 @RequiredArgsConstructor
 @Repository
-public class GoalRepositoryImpl implements GoalRepositoryCustom {
+public class GoalRepositoryImpl {
+
     private final JPAQueryFactory jpaQueryFactory;
     private final EntityManager entityManager;
 }

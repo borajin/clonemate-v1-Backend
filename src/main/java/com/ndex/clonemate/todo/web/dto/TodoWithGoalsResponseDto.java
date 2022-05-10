@@ -8,11 +8,11 @@ import java.util.List;
 
 @Getter
 @Builder
-public class TodosResponseDto {
+public class TodoWithGoalsResponseDto {
     Long id;
-    Long orderNo;
-    String title;
+    Integer orderNo;
+    String contents;
     String privacy;
-    String titleColor;
+    String color;
     List<TodoResponseMapping> todos;
 }

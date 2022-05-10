@@ -1,16 +1,12 @@
 package com.ndex.clonemate.todo.web.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public class TodoOverviewResponseDto {
     Integer numTodoDay;
     Long numTodoCount;
-    String ynComplete;
-
-    public TodoOverviewResponseDto(Integer numTodoDay, Long numTodoCount, String ynComplete) {
-        this.numTodoDay = numTodoDay;
-        this.numTodoCount = numTodoCount;
-        this.ynComplete = ynComplete;
-    }
+    Boolean isCompleted;
 }

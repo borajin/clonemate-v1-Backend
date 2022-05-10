@@ -1,35 +1,37 @@
 package com.ndex.clonemate.goal.web.dto;
 
 import com.ndex.clonemate.goal.domain.Goal;
+import com.ndex.clonemate.goal.domain.PrivacyType;
 import com.ndex.clonemate.user.domain.User;
-import lombok.Builder;
+import com.ndex.clonemate.utils.CommonUtils;
+import java.util.Locale;
 import lombok.Getter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
-@Builder
-@Getter //직렬화에 필요
+@Getter
 public class GoalCreateRequestDto {
-    private Long orderNo;
+
+    private Integer orderNo;
 
     @NotBlank
-    private String title;
+    private String contents;
 
     @NotBlank
     private String privacy;
 
     @NotBlank
-    @Pattern(regexp = "^#(?:[0-9a-f]{2}){3}$")
-    private String titleColor;
+    @Pattern(regexp = CommonUtils.REGEXP_COLOR_CODE)
+    private String color;
 
     public Goal toEntity(User user) {
         return Goal.builder()
-                .user(user)
-                .orderNo(orderNo)
-                .title(title)
-                .privacy(privacy)
-                .titleColor(titleColor)
-                .build();
+            .user(user)
+            .orderNo(orderNo)
+            .contents(contents)
+            .privacy(PrivacyType.valueOf(privacy.toUpperCase(Locale.ROOT)))
+            .color(color)
+            .build();
     }
 }

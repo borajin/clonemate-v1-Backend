@@ -1,19 +1,28 @@
 package com.ndex.clonemate.goal.domain;
 
-import com.ndex.clonemate.goal.domain.repository.PrivacyType;
 import com.ndex.clonemate.goal.web.dto.GoalUpdateRequestDto;
 import com.ndex.clonemate.user.domain.User;
+import com.ndex.clonemate.utils.CommonUtils;
+import java.util.Locale;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
-
 @Getter
-@NoArgsConstructor  //update, delete 에 필요
+@NoArgsConstructor
 @Entity
 @Table(name = "goals")
 public class Goal {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,39 +32,43 @@ public class Goal {
     private User user;
 
     @Column(nullable = false)
-    private Long orderNo;
+    private Integer orderNo;
 
     @Column(nullable = false)
-    private String title;
+    private String contents;
 
-    @Enumerated(EnumType.STRING)    //EnumType.STRING 을 하면 ENUM NAME 그대로 저장됨 (안붙이면 정수형 숫자가 저장됨)
     @Column(length = 8, nullable = false)
     private PrivacyType privacy;
 
-    // #(1) + rgb(6) 색상코드
-    @Column(length = 7, nullable = false)
-    private String titleColor;
+    @Column(length = 7, nullable = false)   // #(1) + rgb(6) 색상코드
+    private String color;
 
     @Builder
-    public Goal(User user, Long orderNo, String title, String privacy, String titleColor) {
+    public Goal(User user, Integer orderNo, String contents, PrivacyType privacy, String color) {
         this.user = user;
         this.orderNo = orderNo;
-        this.title = title;
-        this.privacy = PrivacyType.of(privacy);
-        this.titleColor = titleColor;
-    }
-
-    public void update(GoalUpdateRequestDto params) {
-        if (params.getTitle() != null) this.title = params.getTitle();
-        if (params.getPrivacy() != null) this.privacy = PrivacyType.of(params.getPrivacy());
-        if (params.getTitleColor() != null) this.titleColor = params.getTitleColor();
-    }
-
-    public void updateOrderNo(Long orderNo) {
-        this.orderNo = orderNo;
+        this.contents = contents;
+        this.privacy = privacy;
+        this.color = color;
     }
 
     public String getPrivacy() {
-        return this.privacy.getFullName();
+        return this.privacy.getValue();
+    }
+
+    public void update(GoalUpdateRequestDto params) {
+        if (!CommonUtils.isEmpty(params.getContents())) {
+            this.contents = params.getContents();
+        }
+        if (!CommonUtils.isEmpty(params.getPrivacy())) {
+            this.privacy = PrivacyType.valueOf(params.getPrivacy().toUpperCase(Locale.ROOT));
+        }
+        if (!CommonUtils.isEmpty(params.getColor())) {
+            this.color = params.getColor();
+        }
+    }
+
+    public void updateOrderNo(Integer orderNo) {
+        this.orderNo = orderNo;
     }
 }

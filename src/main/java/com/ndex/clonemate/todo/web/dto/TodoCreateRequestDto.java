@@ -12,9 +12,10 @@ import java.time.LocalDate;
 
 @Getter
 public class TodoCreateRequestDto {
+
     private Long goalId;
-    private Long orderNo;
-    private String title;
+    private Integer orderNo;
+    private String contents;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
@@ -25,47 +26,39 @@ public class TodoCreateRequestDto {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate endRepeatDate;
 
-    @Pattern(regexp = "[YN]")
-    private Character repeatMonYn;
+    private Boolean isRepeatMon;
 
-    @Pattern(regexp = "[YN]")
-    private Character repeatTueYn;
+    private Boolean isRepeatTue;
 
-    @Pattern(regexp = "[YN]")
-    private Character repeatWenYn;
+    private Boolean isRepeatWen;
 
-    @Pattern(regexp = "[YN]")
-    private Character repeatThuYn;
+    private Boolean isRepeatThu;
 
-    @Pattern(regexp = "[YN]")
-    private Character repeatFriYn;
+    private Boolean isRepeatFri;
 
-    @Pattern(regexp = "[YN]")
-    private Character repeatSatYn;
+    private Boolean isRepeatSat;
 
-    @Pattern(regexp = "[YN]")
-    private Character repeatSunYn;
+    private Boolean isRepeatSun;
 
-    @Pattern(regexp = "[YN]")
-    private Character checkYn;
+    private Boolean isChecked;
 
     public Todo toEntity(User user, Goal goal) {
         return Todo.builder()
-                .user(user)
-                .goal(goal)
-                .orderNo(orderNo)
-                .title(title)
-                .date(date)
-                .startRepeatDate(startRepeatDate)
-                .endRepeatDate(endRepeatDate)
-                .repeatMonYn(repeatMonYn)
-                .repeatTueYn(repeatTueYn)
-                .repeatWenYn(repeatWenYn)
-                .repeatThuYn(repeatThuYn)
-                .repeatSatYn(repeatSatYn)
-                .repeatFriYn(repeatFriYn)
-                .repeatSatYn(repeatSatYn)
-                .repeatSunYn(repeatSunYn)
-                .build();
+            .user(user)
+            .goal(goal)
+            .orderNo(orderNo)
+            .contents(contents)
+            .date(date)
+            .startRepeatDate(startRepeatDate)
+            .endRepeatDate(endRepeatDate)
+            .isRepeatMon(isRepeatMon)
+            .isRepeatTue(isRepeatTue)
+            .isRepeatWen(isRepeatWen)
+            .isRepeatThu(isRepeatThu)
+            .isRepeatSat(isRepeatSat)
+            .isRepeatFri(isRepeatFri)
+            .isRepeatSat(isRepeatSat)
+            .isRepeatSun(isRepeatSun)
+            .build();
     }
 }

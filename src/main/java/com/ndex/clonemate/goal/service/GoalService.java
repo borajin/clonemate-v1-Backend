@@ -13,7 +13,7 @@ public interface GoalService {
 
     void createGoal(Long userId, GoalCreateRequestDto params);
 
-    void updateGoal(Long id, GoalUpdateRequestDto params);
+    void updateGoal(Long userId, Long id, GoalUpdateRequestDto params);
 
-    void deleteGoal(Long id);
+    void deleteGoal(Long userId, Long id);
 }

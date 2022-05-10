@@ -17,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class LikeServiceImpl implements LikeService {
+
     private final static String ERROR_NO_USER = "[ERROR] 해당 사용자가 없습니다.";
     private final static String ERROR_NO_TODO = "[ERROR] 해당 투두가 없습니다.";
 
@@ -32,8 +33,10 @@ public class LikeServiceImpl implements LikeService {
     @Override
     @Transactional
     public void like(Long todoId, Long userId) {
-        Todo todo = todoRepository.findById(Todo.class, todoId).orElseThrow(()-> new IllegalArgumentException(ERROR_NO_TODO));
-        User user = userRepository.findById(User.class, userId).orElseThrow(()-> new IllegalArgumentException(ERROR_NO_USER));
+        Todo todo = todoRepository.findById(Todo.class, todoId)
+            .orElseThrow(() -> new IllegalArgumentException(ERROR_NO_TODO));
+        User user = userRepository.findById(User.class, userId)
+            .orElseThrow(() -> new IllegalArgumentException(ERROR_NO_USER));
 
         Like like = Like.builder().todo(todo).user(user).build();
         likeRepository.save(like);

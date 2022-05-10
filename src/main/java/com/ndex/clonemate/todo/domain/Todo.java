@@ -2,8 +2,11 @@ package com.ndex.clonemate.todo.domain;
 
 import com.ndex.clonemate.goal.domain.Goal;
 import com.ndex.clonemate.like.domain.Like;
-import com.ndex.clonemate.todo.web.dto.TodoUpdateRequestDto;
+import com.ndex.clonemate.todo.web.dto.TodoUpdateWithoutOrderAndGoalRequestDto;
 import com.ndex.clonemate.user.domain.User;
+import com.ndex.clonemate.utils.CommonUtils;
+import com.ndex.clonemate.utils.CommonUtils.Days;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,10 +20,11 @@ import java.util.Objects;
 import java.util.Set;
 
 @Getter
-@NoArgsConstructor //update, delete 에 필요.
+@NoArgsConstructor
 @Entity
 @Table(name = "todos")
 public class Todo {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,13 +38,13 @@ public class Todo {
     private Goal goal;
 
     @OneToMany(mappedBy = "todo", cascade = CascadeType.ALL)
-    private Set<Like> likes = new HashSet<>();
+    private final Set<Like> likes = new HashSet<>();
 
     @Column(nullable = false)
-    private Long orderNo;
+    private Integer orderNo;
 
     @Column(nullable = false)
-    private String title;
+    private String contents;
 
     private LocalDate date;
 
@@ -49,89 +53,124 @@ public class Todo {
     private LocalDate endRepeatDate;
 
     @Column(nullable = false)
-    private Character repeatMonYn;
+    private TFCode isRepeatMon;
 
     @Column(nullable = false)
-    private Character repeatTueYn;
+    private TFCode isRepeatTue;
 
     @Column(nullable = false)
-    private Character repeatWenYn;
+    private TFCode isRepeatWen;
 
     @Column(nullable = false)
-    private Character repeatThuYn;
+    private TFCode isRepeatThu;
 
     @Column(nullable = false)
-    private Character repeatFriYn;
+    private TFCode isRepeatFri;
 
     @Column(nullable = false)
-    private Character repeatSatYn;
+    private TFCode isRepeatSat;
 
     @Column(nullable = false)
-    private Character repeatSunYn;
+    private TFCode isRepeatSun;
 
     @Column(nullable = false)
-    private Character checkYn;   //oracle 에는 boolean 이 없음. 다른 db 호환 위해 char 형 사용하기)
+    private TFCode isChecked;
 
-    //userId 를 생성하지 않기 위해 직접 빌더 만들어줌. (builder.default 로 따로 명시 안하면 기본값 0, null, false )
     @Builder
-    public Todo(User user, Goal goal, Long orderNo, String title, LocalDate date, LocalDate startRepeatDate, LocalDate endRepeatDate, Character repeatMonYn, Character repeatTueYn, Character repeatWenYn, Character repeatThuYn, Character repeatFriYn, Character repeatSatYn, Character repeatSunYn) {
+    public Todo(User user, Goal goal, Integer orderNo, String contents, LocalDate date,
+        LocalDate startRepeatDate, LocalDate endRepeatDate, Boolean isRepeatMon,
+        Boolean isRepeatTue, Boolean isRepeatWen, Boolean isRepeatThu, Boolean isRepeatFri,
+        Boolean isRepeatSat, Boolean isRepeatSun) {
         this.user = user;
         this.goal = goal;
         this.orderNo = orderNo;
-        this.title = title;
+        this.contents = contents;
         this.date = date;
         this.startRepeatDate = startRepeatDate;
         this.endRepeatDate = endRepeatDate;
-        this.repeatMonYn = repeatMonYn;
-        this.repeatTueYn = repeatTueYn;
-        this.repeatWenYn = repeatWenYn;
-        this.repeatThuYn = repeatThuYn;
-        this.repeatFriYn = repeatFriYn;
-        this.repeatSatYn = repeatSatYn;
-        this.repeatSunYn = repeatSunYn;
-        this.checkYn = 'N';
+        this.isRepeatMon = TFCode.boolValueOf(isRepeatMon);
+        this.isRepeatTue = TFCode.boolValueOf(isRepeatTue);
+        this.isRepeatWen = TFCode.boolValueOf(isRepeatWen);
+        this.isRepeatThu = TFCode.boolValueOf(isRepeatThu);
+        this.isRepeatFri = TFCode.boolValueOf(isRepeatFri);
+        this.isRepeatSat = TFCode.boolValueOf(isRepeatSat);
+        this.isRepeatSun = TFCode.boolValueOf(isRepeatSun);
+        this.isChecked = TFCode.FALSE;
     }
 
-    public void update(TodoUpdateRequestDto params) {
-        if (params.getTitle() != null) this.title = params.getTitle();
-        if (params.getDate() != null) this.date = params.getDate();
-        if(params.getStartRepeatDate() != null) this.startRepeatDate = params.getStartRepeatDate();
-        if (params.getEndRepeatDate() != null) this.endRepeatDate = params.getEndRepeatDate();
-        if (params.getRepeatMonYn() != null) this.repeatMonYn = params.getRepeatMonYn();
-        if (params.getRepeatTueYn() != null) this.repeatTueYn = params.getRepeatTueYn();
-        if (params.getRepeatWenYn() != null) this.repeatWenYn = params.getRepeatWenYn();
-        if (params.getRepeatThuYn() != null) this.repeatThuYn = params.getRepeatThuYn();
-        if (params.getRepeatFriYn() != null) this.repeatFriYn = params.getRepeatFriYn();
-        if (params.getRepeatSatYn() != null) this.repeatSatYn = params.getRepeatSatYn();
-        if (params.getRepeatSunYn() != null) this.repeatSunYn = params.getRepeatSunYn();
-        if (params.getCheckYn() != null) this.checkYn = params.getCheckYn();
-    }
-
-    public void updateOrderNo(Long orderNo) {
-        this.orderNo = orderNo;
+    public void update(TodoUpdateWithoutOrderAndGoalRequestDto params) {
+        if (!CommonUtils.isEmpty(params.getContents())) {
+            this.contents = params.getContents();
+        }
+        if (!CommonUtils.isEmpty(params.getDate())) {
+            this.date = params.getDate();
+        }
+        if (!CommonUtils.isEmpty(params.getStartRepeatDate())) {
+            this.startRepeatDate = params.getStartRepeatDate();
+        }
+        if (!CommonUtils.isEmpty(params.getEndRepeatDate())) {
+            this.endRepeatDate = params.getEndRepeatDate();
+        }
+        if (!CommonUtils.isEmpty(params.getIsRepeatMon())) {
+            this.isRepeatMon = TFCode.boolValueOf(params.getIsRepeatMon());
+        }
+        if (!CommonUtils.isEmpty(params.getIsRepeatTue())) {
+            this.isRepeatTue = TFCode.boolValueOf(params.getIsRepeatTue());
+        }
+        if (!CommonUtils.isEmpty(params.getIsRepeatWen())) {
+            this.isRepeatWen = TFCode.boolValueOf(params.getIsRepeatWen());
+        }
+        if (!CommonUtils.isEmpty(params.getIsRepeatThu())) {
+            this.isRepeatThu = TFCode.boolValueOf(params.getIsRepeatThu());
+        }
+        if (!CommonUtils.isEmpty(params.getIsRepeatFri())) {
+            this.isRepeatFri = TFCode.boolValueOf(params.getIsRepeatFri());
+        }
+        if (!CommonUtils.isEmpty(params.getIsRepeatSat())) {
+            this.isRepeatSat = TFCode.boolValueOf(params.getIsRepeatSat());
+        }
+        if (!CommonUtils.isEmpty(params.getIsRepeatSun())) {
+            this.isRepeatSun = TFCode.boolValueOf(params.getIsRepeatSun());
+        }
+        if (!CommonUtils.isEmpty(params.getIsChecked())) {
+            this.isChecked = TFCode.boolValueOf(params.getIsChecked());
+        }
     }
 
     public Long getGoalId() {
         return this.goal.getId();
     }
 
-    public HashMap<String, Character> getRepeatDays() {
-        HashMap<String, Character> repeatDays = new HashMap<>();
-        repeatDays.put("MON", this.repeatMonYn);
-        repeatDays.put("TUE", this.repeatTueYn);
-        repeatDays.put("WED", this.repeatWenYn);
-        repeatDays.put("THU", this.repeatThuYn);
-        repeatDays.put("FRI", this.repeatFriYn);
-        repeatDays.put("SAT", this.repeatSatYn);
-        repeatDays.put("SUN", this.repeatSunYn);
+    public HashMap<String, Boolean> getRepeatDays() {
+        HashMap<String, Boolean> repeatDays = new HashMap<>();
+
+        repeatDays.put(Days.MON.name(), this.isRepeatMon.isBoolValue());
+        repeatDays.put(Days.TUE.name(), this.isRepeatTue.isBoolValue());
+        repeatDays.put(Days.WED.name(), this.isRepeatWen.isBoolValue());
+        repeatDays.put(Days.THU.name(), this.isRepeatThu.isBoolValue());
+        repeatDays.put(Days.FRI.name(), this.isRepeatFri.isBoolValue());
+        repeatDays.put(Days.SAT.name(), this.isRepeatSat.isBoolValue());
+        repeatDays.put(Days.SUN.name(), this.isRepeatSun.isBoolValue());
 
         return repeatDays;
     }
 
+    public Boolean getIsChecked() {
+        return this.isChecked.isBoolValue();
+    }
+
+    public void updateOrderNo(Integer orderNo) {
+        this.orderNo = orderNo;
+    }
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
+            return false;
+        }
         Todo todo = (Todo) o;
         return id != null && Objects.equals(id, todo.id);
     }

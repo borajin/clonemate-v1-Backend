@@ -16,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class FollowServiceImpl implements FollowService {
+
     private final static String ERROR_NO_USER = "[ERROR] 해당 사용자가 없습니다.";
 
     private final UserRepository userRepository;
@@ -23,7 +24,7 @@ public class FollowServiceImpl implements FollowService {
 
     @Override
     public List<FollowerResponseMapping> getFollowers(Long userId) {
-        return followRepository.findByFollower_Id(FollowerResponseMapping.class, userId);
+        return followRepository.findByTarget_Id(FollowerResponseMapping.class, userId);
     }
 
     @Override
@@ -34,11 +35,12 @@ public class FollowServiceImpl implements FollowService {
     @Override
     @Transactional
     public void follow(Long userId, Long followId) {
-        //TODO : user, follower 를 find 해서 Follow 에 넣어주는 게 맞는지...
-        User user = userRepository.findById(User.class, userId).orElseThrow(() -> new IllegalArgumentException(ERROR_NO_USER + "id : " + userId));
-        User follower = userRepository.findById(User.class, followId).orElseThrow(() -> new IllegalArgumentException(ERROR_NO_USER + "id : " + followId));
+        User user = userRepository.findById(User.class, userId)
+            .orElseThrow(() -> new IllegalArgumentException(ERROR_NO_USER + "id : " + userId));
+        User target = userRepository.findById(User.class, followId)
+            .orElseThrow(() -> new IllegalArgumentException(ERROR_NO_USER + "id : " + followId));
 
-        Follow follow = Follow.builder().user(user).follower(follower).build();
+        Follow follow = Follow.builder().user(user).target(target).build();
         followRepository.save(follow);
     }
 

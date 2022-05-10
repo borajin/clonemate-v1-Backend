@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/likes")
 @RestController
 public class LikeController {
+
     private final LikeService likeService;
 
     @PostMapping("/{id}")

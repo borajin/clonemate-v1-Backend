@@ -13,30 +13,31 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/follows")
 @RestController
 public class FollowController {
+
     private final FollowService followService;
 
     @GetMapping("/followers")
     public ApiResult<?> getFollowers(CustomAuthenticationToken token) {
-        Long userId = token.getId();
-        return ApiUtils.createSuccessApi(followService.getFollowers(userId));
+        Long sessionUserId = token.getId();
+        return ApiUtils.createSuccessApi(followService.getFollowers(sessionUserId));
     }
 
     @GetMapping("/followings")
     public ApiResult<?> getFollowings(CustomAuthenticationToken token) {
-        Long userId = token.getId();
-        return ApiUtils.createSuccessApi(followService.getFollowings(userId));
+        Long sessionUserId = token.getId();
+        return ApiUtils.createSuccessApi(followService.getFollowings(sessionUserId));
     }
 
     @PostMapping("/{id}")
-    public ApiResult<?> follow(CustomAuthenticationToken token, @PathVariable("id") Long followId) {
-        Long userId = token.getId();
-        followService.follow(userId, followId);
+    public ApiResult<?> follow(CustomAuthenticationToken token, @PathVariable("id") Long followsId) {
+        Long sessionUserId = token.getId();
+        followService.follow(sessionUserId, followsId);
         return ApiUtils.createSuccessEmptyApi();
     }
 
     @DeleteMapping("/{id}")
-    public ApiResult<?> unFollow(@PathVariable("id") Long unFollowId) {
-        followService.unFollow(unFollowId);
+    public ApiResult<?> unFollow(@PathVariable("id") Long followsId) {
+        followService.unFollow(followsId);
         return ApiUtils.createSuccessEmptyApi();
     }
 }

@@ -9,16 +9,17 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Getter
-@NoArgsConstructor //update, delete 에 필요.
+@NoArgsConstructor
 @Entity
 @Table(name = "likes")
 public class Like {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="todo_id", nullable = false)
+    @JoinColumn(name = "todo_id", nullable = false)
     private Todo todo;
 
     @ManyToOne(fetch = FetchType.LAZY)

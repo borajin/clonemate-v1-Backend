@@ -6,6 +6,7 @@ import com.ndex.clonemate.follow.domain.mapper.FollowingResponseMapping;
 import java.util.List;
 
 public interface FollowService {
+
     List<FollowerResponseMapping> getFollowers(Long userId);
 
     List<FollowingResponseMapping> getFollowings(Long userId);

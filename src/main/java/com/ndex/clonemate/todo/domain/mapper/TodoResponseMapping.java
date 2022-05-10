@@ -7,14 +7,24 @@ import java.util.HashMap;
 import java.util.Set;
 
 public interface TodoResponseMapping {
+
     Long getGoalId();
+
     Long getId();
-    Long getOrderNo();
-    String getTitle();
+
+    Integer getOrderNo();
+
+    String getContents();
+
     LocalDate getDate();
+
     LocalDate getStartRepeatDate();
+
     LocalDate getEndRepeatDate();
-    HashMap<String, Character> getRepeatDays();
-    String getCheckYn();
+
+    HashMap<String, Boolean> getRepeatDays();
+
+    Boolean getIsChecked();
+
     Set<LikeResponseMapping> getLikes();
 }

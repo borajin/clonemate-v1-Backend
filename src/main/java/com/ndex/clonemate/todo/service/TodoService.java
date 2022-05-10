@@ -11,18 +11,20 @@ import java.util.List;
 public interface TodoService {
     TodoResponseMapping getTodo(Long id);
 
-    List<TodosResponseDto> getTodos(Long userId, LocalDate date);
+    List<TodoWithGoalsResponseDto> getTodosWithGoals(Long userId, LocalDate date);
 
     List<TodoOverviewResponseDto> getTodosOverview(Long userId, YearMonth dateYm);
 
     void createTodo(Long userId, TodoCreateRequestDto params);
 
-    void updateTodo(Long id, TodoUpdateRequestDto params);
+    void updateTodo(Long sessionUserId, Long id, TodoUpdateWithoutOrderAndGoalRequestDto params);
 
-    void updateTodos(Long userId, TodosCondition condition, TodoUpdateRequestDto params);
+    void updateTodos(Long userId, TodoUpdateOrDeleteRequestDto condition, TodoUpdateWithoutOrderAndGoalRequestDto params);
 
-    void deleteTodo(Long id);
+    void updateTodosOrder(Long userId, List<TodoUpdateOrderAndGoalRequestDto> params);
 
-    void deleteTodos(Long userId, TodosCondition condition);
+    void deleteTodo(Long sessionUserId, Long id);
+
+    void deleteTodos(Long userId, TodoUpdateOrDeleteRequestDto condition);
 
 }
