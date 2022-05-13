@@ -23,21 +23,12 @@ public class Follow {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "follower_id", nullable = false)
+    @JoinColumn(name = "target_id", nullable = false)
     private User target;
 
     @Builder
     public Follow(User user, User target) {
         this.user = user;
         this.target = target;
-    }
-
-    //TODO : 이 getter 들이 문제인듯. error 해결 해야 함.
-    public UserResponseMapping getFollowing() {
-        return (UserResponseMapping) this.user;
-    }
-
-    public UserResponseMapping getFollower() {
-        return (UserResponseMapping) this.target;
     }
 }

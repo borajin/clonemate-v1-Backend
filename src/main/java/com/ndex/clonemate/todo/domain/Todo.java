@@ -137,24 +137,6 @@ public class Todo {
         }
     }
 
-    public Long getGoalId() {
-        return this.goal.getId();
-    }
-
-    public HashMap<String, Boolean> getRepeatDays() {
-        HashMap<String, Boolean> repeatDays = new HashMap<>();
-
-        repeatDays.put(Days.MON.name(), this.isRepeatMon.isBoolValue());
-        repeatDays.put(Days.TUE.name(), this.isRepeatTue.isBoolValue());
-        repeatDays.put(Days.WED.name(), this.isRepeatWen.isBoolValue());
-        repeatDays.put(Days.THU.name(), this.isRepeatThu.isBoolValue());
-        repeatDays.put(Days.FRI.name(), this.isRepeatFri.isBoolValue());
-        repeatDays.put(Days.SAT.name(), this.isRepeatSat.isBoolValue());
-        repeatDays.put(Days.SUN.name(), this.isRepeatSun.isBoolValue());
-
-        return repeatDays;
-    }
-
     public Boolean getIsChecked() {
         return this.isChecked.isBoolValue();
     }
