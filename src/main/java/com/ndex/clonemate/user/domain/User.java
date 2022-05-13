@@ -1,4 +1,5 @@
 package com.ndex.clonemate.user.domain;
+
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Table(name = "users")
 @DynamicInsert
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,22 +36,16 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Column(name = "intro_text")
     private String introText;
 
-    @Column(nullable = false, name = "delete_yn", columnDefinition = "character(1) default 'N'")
     private char deleteYn;
 
-    @Column(name = "delete_date")
     private LocalDateTime deleteDate;
 
-    @Column(nullable = false, name = "email_search_yn", columnDefinition = "character(1) default 'Y'")
     private char emailSearchYn;
 
-    @Column(nullable = false, name = "random_yn", columnDefinition = "character(1) default 'Y'")
     private char randomYn;
 
-    @Column(nullable = false, name = "certify_yn", columnDefinition = "character(1) default 'Y'")
     private char certifyYn;
 
     private final static char YES_FLAG = 'Y';
@@ -64,7 +60,8 @@ public class User {
         this.certifyYn = YES_FLAG;
     }
 
-    public void update(String account, String email, String name, String introText, char emailSearchYn, char randomYn) {
+    public void update(String account, String email, String name, String introText,
+        char emailSearchYn, char randomYn) {
         if (isValidString(account)) {
             this.account = account;
         }
@@ -103,18 +100,15 @@ public class User {
 
     @Builder
     public User(String account, String name, String email,
-                String password, String introText) {
+        String password, String introText) {
         this.account = account;
         this.name = name;
         this.email = email;
         this.password = password;
         this.introText = introText;
-
-        //ERROR: invalid byte sequence for encoding "UTF8": 0x00 에러 해결 위해 직접 초기화
-        this.certifyYn=YES_FLAG;
-        this.deleteYn=NO_FLAG;
         this.emailSearchYn=YES_FLAG;
-        this.randomYn=YES_FLAG;
+        this.certifyYn=NO_FLAG;
+        this.deleteYn=NO_FLAG;
     }
 
     private boolean isValidString(String str) {
