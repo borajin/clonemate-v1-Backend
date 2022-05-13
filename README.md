@@ -33,6 +33,7 @@
 
 ## 시스템 아키텍처
 
-## Api 
+## Api 명세서 
+[github wiki - Api ](https://github.com/borajin/clonemate-v1-Backend/wiki/API-%EB%AA%85%EC%84%B8%EC%84%9C)
 
 ## ERD
