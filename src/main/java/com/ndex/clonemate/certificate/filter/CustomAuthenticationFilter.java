@@ -3,7 +3,7 @@ package com.ndex.clonemate.certificate.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ndex.clonemate.certificate.filter.dto.CertificateDto;
 import com.ndex.clonemate.certificate.model.CustomAuthenticationToken;
-import com.ndex.clonemate.utils.StringUtils;
+import com.ndex.clonemate.global.utils.StringUtils;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

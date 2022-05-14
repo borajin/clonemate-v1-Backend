@@ -2,7 +2,7 @@ package com.ndex.clonemate.certificate.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ndex.clonemate.certificate.handler.dto.LoginResponseDto;
-import com.ndex.clonemate.utils.ApiResult;
+import com.ndex.clonemate.global.dto.ApiResult;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

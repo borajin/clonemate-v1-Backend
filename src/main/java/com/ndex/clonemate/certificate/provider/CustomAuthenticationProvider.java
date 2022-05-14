@@ -1,8 +1,8 @@
 package com.ndex.clonemate.certificate.provider;
 
+import com.ndex.clonemate.certificate.service.CustomUserService;
 import com.ndex.clonemate.certificate.model.CustomAuthenticationToken;
 import com.ndex.clonemate.certificate.model.CustomUserDetails;
-import com.ndex.clonemate.certificate.service.CustomUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;

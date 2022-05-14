@@ -1,9 +1,9 @@
 package com.ndex.clonemate.certificate.config;
 
-import com.ndex.clonemate.certificate.filter.CustomAuthenticationFilter;
 import com.ndex.clonemate.certificate.handler.LoginFailureHandler;
 import com.ndex.clonemate.certificate.handler.LoginSuccessHandler;
 import com.ndex.clonemate.certificate.provider.CustomAuthenticationProvider;
+import com.ndex.clonemate.certificate.filter.CustomAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

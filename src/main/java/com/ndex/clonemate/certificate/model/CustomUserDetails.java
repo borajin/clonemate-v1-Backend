@@ -1,6 +1,6 @@
 package com.ndex.clonemate.certificate.model;
 
-import com.ndex.clonemate.user.domain.User;
+import com.ndex.clonemate.domain.user.repository.User;
 import java.util.ArrayList;
 import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;

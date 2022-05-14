@@ -5,28 +5,15 @@ plugins {
 
     // querydsl 추가
     id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
-
-    // api 명세서 자동화
-	id "org.asciidoctor.jvm.convert" version "3.3.2"
 }
 
 group = 'com.1ndex'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '8'
 
-ext {
-    snippetsDir = file('build/generated-snippets')
-}
-
 bootJar {
     archivesBaseName = 'clonetodo-backend'
     archiveFileName = 'clonetodo-backend-1.0.0.jar'
-
-	dependsOn asciidoctor
-	    copy {
-	        from "${asciidoctor.outputDir}"
-	        into 'BOOT-INF/classes/static/docs'
-	    }
 }
 
 configurations {
@@ -51,7 +38,6 @@ dependencies {
 
     //test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'    //api 명세서 자동화
 
     //jpa
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -80,22 +66,6 @@ dependencies {
     )
 }
 
-asciidoctor {
-    dependsOn test
-    inputs.dir snippetsDir
-}
-
-asciidoctor.doFirst {
-    delete file('src/main/resources/static/docs')
-}
-
-task copyDocument(type: Copy) {
-    dependsOn asciidoctor
-    from file("build/docs/asciidoc")
-    into file("src/main/resources/static/docs")
-}
-
-
 //======== querydsl ========
 //Q타입 생성 : Gradle → Tasks → build → clean, Gradle → Tasks → other → compileQuerydsl
 def querydslDir = "$buildDir/generated/querydsl"
@@ -120,7 +90,3 @@ compileQuerydsl {
     options.annotationProcessorPath = configurations.querydsl
 }
 //======== querydsl ========
-
-tasks.named('test') {
-    useJUnitPlatform()
-}

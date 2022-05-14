@@ -1,8 +1,8 @@
 package com.ndex.clonemate.certificate.service;
 
 import com.ndex.clonemate.certificate.model.CustomUserDetails;
-import com.ndex.clonemate.user.domain.User;
-import com.ndex.clonemate.user.domain.UserRepository;
+import com.ndex.clonemate.domain.user.repository.User;
+import com.ndex.clonemate.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
