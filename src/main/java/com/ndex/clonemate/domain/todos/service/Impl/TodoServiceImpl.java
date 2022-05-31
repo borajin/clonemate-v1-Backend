@@ -8,6 +8,7 @@ import com.ndex.clonemate.domain.goals.service.GoalService;
 import com.ndex.clonemate.domain.todos.model.Todo;
 import com.ndex.clonemate.domain.todos.repository.TodoResponseMapping;
 import com.ndex.clonemate.domain.todos.web.request.TodoCreateRequest;
+import com.ndex.clonemate.domain.todos.web.request.TodoResponse;
 import com.ndex.clonemate.domain.todos.web.request.TodoUpdateOrDeleteRequest;
 import com.ndex.clonemate.domain.todos.web.request.TodoUpdateOrderAndGoalRequest;
 import com.ndex.clonemate.domain.todos.web.request.TodoUpdateWithoutOrderAndGoalRequest;
@@ -45,9 +46,9 @@ public class TodoServiceImpl implements TodoService {
     @Override
     public List<TodoWithGoalsResponse> getTodos(Long userId, LocalDate date) {
         List<GoalResponseMapping> goals = goalService.getGoals(userId);
-        List<TodoResponseMapping> todos = todoRepository.findTodos(userId, date);
+        List<TodoResponse> todos = todoRepository.findTodos(userId, date);
 
-        HashMap<Long, List<TodoResponseMapping>> temp = new HashMap<>();
+        HashMap<Long, List<TodoResponse>> temp = new HashMap<>();
         goals.forEach(goal -> {
             temp.put(goal.getId(), new ArrayList<>());
         });

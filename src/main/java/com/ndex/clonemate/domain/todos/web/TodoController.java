@@ -18,15 +18,15 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 
 @RequiredArgsConstructor
-@RequestMapping("api/v1//todos")
+@RequestMapping("api/v1/todos")
 @RestController
 public class TodoController {
 
     private final TodoService todoService;
 
     @GetMapping
-    public ApiResult<?> getTodos(@RequestParam Long userId,
-        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+    public ApiResult<?> getTodos(@RequestParam(required = false) Long userId,
+        @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         return ApiUtils.createSuccessApi(todoService.getTodos(userId, date));
     }
 
@@ -36,8 +36,8 @@ public class TodoController {
     }
 
     @GetMapping("/overview")
-    public ApiResult<?> getTodoOverview(@RequestParam Long userId,
-        @RequestParam @DateTimeFormat(pattern = "yyyy-MM") YearMonth dateYm) {
+    public ApiResult<?> getTodoOverview(@RequestParam(required = false) Long userId,
+        @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM") YearMonth dateYm) {
         return ApiUtils.createSuccessApi(todoService.getTodosOverview(userId, dateYm));
     }
 
@@ -59,8 +59,9 @@ public class TodoController {
 
     @PatchMapping
     public ApiResult<?> updateTodos(CustomAuthenticationToken token,
-        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
-        @RequestParam Boolean isChecked, @RequestBody TodoUpdateWithoutOrderAndGoalRequest params) {
+        @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
+        @RequestParam(required = false) Boolean isChecked,
+        @RequestBody TodoUpdateWithoutOrderAndGoalRequest params) {
         Long sessionUserId = token.getId();
         TodoUpdateOrDeleteRequest condition = TodoUpdateOrDeleteRequest.builder().date(date)
             .isChecked(TFCode.boolValueOf(isChecked)).build();
@@ -69,7 +70,8 @@ public class TodoController {
     }
 
     @PatchMapping("/order")
-    public ApiResult<?> updateTodosOrder(CustomAuthenticationToken token, @RequestBody List<TodoUpdateOrderAndGoalRequest> params) {
+    public ApiResult<?> updateTodosOrder(CustomAuthenticationToken token,
+        @RequestBody List<TodoUpdateOrderAndGoalRequest> params) {
         Long sessionUserId = token.getId();
         todoService.updateTodosOrder(sessionUserId, params);
         return ApiUtils.createSuccessEmptyApi();
@@ -84,8 +86,8 @@ public class TodoController {
 
     @DeleteMapping
     public ApiResult<?> deleteTodos(CustomAuthenticationToken token,
-        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
-        @RequestParam Boolean isChecked) {
+        @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
+        @RequestParam(required = false) Boolean isChecked) {
         Long sessionUserId = token.getId();
         TodoUpdateOrDeleteRequest condition = TodoUpdateOrDeleteRequest.builder().date(date)
             .isChecked(TFCode.boolValueOf(isChecked)).build();

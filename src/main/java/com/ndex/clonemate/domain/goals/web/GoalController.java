@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RequiredArgsConstructor
-@RequestMapping("api/v1//goals")
+@RequestMapping("api/v1/goals")
 @RestController
 public class GoalController {
 
@@ -39,7 +39,7 @@ public class GoalController {
     }
 
     @PatchMapping("/{id}")
-    public ApiResult<?> updateGoal(CustomAuthenticationToken token,@PathVariable("id") Long id,
+    public ApiResult<?> updateGoal(CustomAuthenticationToken token, @PathVariable("id") Long id,
         @Valid @RequestBody GoalUpdateRequest params) {
         Long sessionUserId = token.getId();
         goalService.updateGoal(sessionUserId, id, params);
@@ -47,7 +47,7 @@ public class GoalController {
     }
 
     @DeleteMapping("/{id}")
-    public ApiResult<?> deleteGoal(CustomAuthenticationToken token,@PathVariable("id") Long id) {
+    public ApiResult<?> deleteGoal(CustomAuthenticationToken token, @PathVariable("id") Long id) {
         Long sessionUserId = token.getId();
         goalService.deleteGoal(sessionUserId, id);
         return ApiUtils.createSuccessEmptyApi();

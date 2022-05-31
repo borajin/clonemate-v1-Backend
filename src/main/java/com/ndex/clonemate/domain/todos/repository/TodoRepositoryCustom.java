@@ -1,5 +1,6 @@
 package com.ndex.clonemate.domain.todos.repository;
 
+import com.ndex.clonemate.domain.todos.web.request.TodoResponse;
 import com.ndex.clonemate.domain.todos.web.response.TodoOverviewResponse;
 import com.ndex.clonemate.domain.todos.web.request.TodoUpdateOrderAndGoalRequest;
 import com.ndex.clonemate.domain.todos.web.request.TodoUpdateWithoutOrderAndGoalRequest;
@@ -11,7 +12,7 @@ import java.util.List;
 
 public interface TodoRepositoryCustom {
 
-    List<TodoResponseMapping> findTodos(Long userId, LocalDate date);
+    List<TodoResponse> findTodos(Long userId, LocalDate date);
 
     List<TodoOverviewResponse> findTodoOverview(Long userId, YearMonth dateYm);
 

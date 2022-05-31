@@ -1,6 +1,6 @@
 package com.ndex.clonemate.domain.todos.web.response;
 
-import com.ndex.clonemate.domain.todos.repository.TodoResponseMapping;
+import com.ndex.clonemate.domain.todos.web.request.TodoResponse;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -14,5 +14,5 @@ public class TodoWithGoalsResponse {
     String contents;
     String privacy;
     String color;
-    List<TodoResponseMapping> todos;
+    List<TodoResponse> todos;
 }

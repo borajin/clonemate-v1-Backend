@@ -1,6 +1,7 @@
 package com.ndex.clonemate.domain.todos.repository;
 
 import com.ndex.clonemate.domain.todos.model.TFCode;
+import com.ndex.clonemate.domain.todos.web.request.TodoResponse;
 import com.ndex.clonemate.domain.todos.web.response.TodoOverviewResponse;
 import com.ndex.clonemate.domain.todos.web.request.TodoUpdateOrderAndGoalRequest;
 import com.ndex.clonemate.domain.todos.web.request.TodoUpdateWithoutOrderAndGoalRequest;
@@ -32,37 +33,37 @@ public class TodoRepositoryImpl implements TodoRepositoryCustom {
     private final EntityManager entityManager;
 
     @Override
-    public List<TodoResponseMapping> findTodos(Long userId, LocalDate date) {
+    public List<TodoResponse> findTodos(Long userId, LocalDate date) {
         return jpaQueryFactory
-                .select(
-                        Projections.bean(TodoResponseMapping.class,
-                                todo.id,
-                                todo.goal,
-                                todo.orderNo,
-                                todo.date,
-                                todo.startRepeatDate,
-                                todo.endRepeatDate,
-                                todo.isRepeatMon,
-                                todo.isRepeatTue,
-                                todo.isRepeatWen,
-                                todo.isRepeatThu,
-                                todo.isRepeatFri,
-                                todo.isRepeatSat,
-                                todo.isRepeatSun,
-                                todo.isChecked
-                        )
+            .select(
+                Projections.constructor(TodoResponse.class,
+                    todo.id,
+                    todo.goal,
+                    todo.orderNo,
+                    todo.contents,
+                    todo.date,
+                    todo.startRepeatDate,
+                    todo.endRepeatDate,
+                    todo.isRepeatMon,
+                    todo.isRepeatTue,
+                    todo.isRepeatWen,
+                    todo.isRepeatThu,
+                    todo.isRepeatFri,
+                    todo.isRepeatSat,
+                    todo.isRepeatSun,
+                    todo.isChecked)
 
-                )
-                .from(todo)
-                .where(
-                        eqUserId(userId),
-                        eqDate(date)
-                )
-                .orderBy(
-                        todo.isChecked.asc(),
-                        todo.orderNo.asc()
-                )
-                .fetch();
+            )
+            .from(todo)
+            .where(
+                eqUserId(userId),
+                eqDate(date)
+            )
+            .orderBy(
+                todo.isChecked.asc(),
+                todo.orderNo.asc()
+            )
+            .fetch();
     }
 
     @Override
@@ -70,31 +71,31 @@ public class TodoRepositoryImpl implements TodoRepositoryCustom {
         //"SELECT DAY(todo.date),COUNT(todo.id), CASE WHEN SUM(CASE WHEN todo.checkYn = 'y' THEN 0 ELSE 1 END) = 0 THEN 'y' ELSE 'n' END FROM Todo todo WHERE todo.user.getId() = 1 AND SUBSTRING(todo.date, 1, 7) = '"+ dateYm +"' GROUP BY todo.id";
 
         NumberExpression<Integer> isAllTodoCheckedCountCase = new CaseBuilder()
-                .when(todo.isChecked.eq(TFCode.TRUE)).then(0)
-                .otherwise(1);
+            .when(todo.isChecked.eq(TFCode.TRUE)).then(0)
+            .otherwise(1);
 
         BooleanExpression isAllTodoCheckedYnCase = new CaseBuilder()
-                .when(isAllTodoCheckedCountCase.sum().eq(0)).then(TFCode.TRUE.isBoolValue())
-                .otherwise(TFCode.FALSE.isBoolValue());
+            .when(isAllTodoCheckedCountCase.sum().eq(0)).then(TFCode.TRUE.isBoolValue())
+            .otherwise(TFCode.FALSE.isBoolValue());
 
         return jpaQueryFactory
-                .select(Projections.constructor(TodoOverviewResponse.class,
-                        todo.date.dayOfMonth().as("numTodoDay"),
-                        todo.id.count().as("numTodoCount"),
-                        isAllTodoCheckedYnCase.as("isCompleted")))
-                .from(todo)
-                .where(
-                        eqUserId(userId),
-                        eqDateYm(dateYm)
-                )
-                .groupBy(todo.date)
-                .orderBy(todo.date.asc())
-                .fetch();
+            .select(Projections.constructor(TodoOverviewResponse.class,
+                todo.date.dayOfMonth().as("numTodoDay"),
+                todo.id.count().as("numTodoCount"),
+                isAllTodoCheckedYnCase.as("isCompleted")))
+            .from(todo)
+            .where(
+                eqUserId(userId),
+                eqDateYm(dateYm)
+            )
+            .groupBy(todo.date)
+            .orderBy(todo.date.asc())
+            .fetch();
     }
 
     @Override
     public void updateTodos(Long userId, TodoUpdateOrDeleteRequest condition,
-                            TodoUpdateWithoutOrderAndGoalRequest params) {
+        TodoUpdateWithoutOrderAndGoalRequest params) {
         UpdateClause<JPAUpdateClause> updateBuilder = jpaQueryFactory.update(todo);
 
         if (!CommonUtils.isEmpty(params.getDate())) {
@@ -102,11 +103,11 @@ public class TodoRepositoryImpl implements TodoRepositoryCustom {
         }
 
         updateBuilder.where(
-                        eqUserId(userId),
-                        eqDate(condition.getDate()),
-                        eqIsChecked(condition.getIsChecked())
-                )
-                .execute();
+                eqUserId(userId),
+                eqDate(condition.getDate()),
+                eqIsChecked(condition.getIsChecked())
+            )
+            .execute();
 
         //영속성 유지
         entityManager.flush();
@@ -117,7 +118,7 @@ public class TodoRepositoryImpl implements TodoRepositoryCustom {
     public void updateOrderOrGoal(Long userId, List<TodoUpdateOrderAndGoalRequest> params) {
         //쿼리 생성
         StringBuilder updateOrderQuery = new StringBuilder(
-                "UPDATE Todo SET ");
+            "UPDATE Todo SET ");
         StringBuilder updateGoalIdQuery = new StringBuilder();
 
         updateOrderQuery.append("order_no = CASE");
@@ -125,9 +126,9 @@ public class TodoRepositoryImpl implements TodoRepositoryCustom {
 
         params.forEach(item -> {
             updateOrderQuery.append(" WHEN id = ").append(item.getId()).append(" THEN ")
-                    .append(item.getOrderNo());
+                .append(item.getOrderNo());
             updateGoalIdQuery.append(" WHEN id = ").append(item.getId()).append(" THEN ")
-                    .append(item.getGoalId());
+                .append(item.getGoalId());
         });
 
         updateOrderQuery.append(" ELSE order_no END");
@@ -136,7 +137,7 @@ public class TodoRepositoryImpl implements TodoRepositoryCustom {
         updateOrderQuery.append(updateGoalIdQuery).append(" WHERE user_id = ").append(userId);
 
         entityManager.createQuery(updateOrderQuery.toString())
-                .executeUpdate();
+            .executeUpdate();
 
         entityManager.flush();
         entityManager.clear();
@@ -145,10 +146,10 @@ public class TodoRepositoryImpl implements TodoRepositoryCustom {
     @Override
     public void deleteTodos(Long userId, TodoUpdateOrDeleteRequest condition) {
         jpaQueryFactory.delete(todo)
-                .where(eqUserId(userId),
-                        eqDate(condition.getDate()),
-                        eqIsChecked(condition.getIsChecked()))
-                .execute();
+            .where(eqUserId(userId),
+                eqDate(condition.getDate()),
+                eqIsChecked(condition.getIsChecked()))
+            .execute();
     }
 
     private BooleanExpression eqUserId(Long userId) {
@@ -156,7 +157,6 @@ public class TodoRepositoryImpl implements TodoRepositoryCustom {
             return null;
         }
 
-        
         return todo.user.id.eq(userId);
     }
 
@@ -172,7 +172,7 @@ public class TodoRepositoryImpl implements TodoRepositoryCustom {
             return null;
         }
         return todo.date.year().eq(dateYm.getYear())
-                .and(todo.date.month().eq(dateYm.getMonthValue()));
+            .and(todo.date.month().eq(dateYm.getMonthValue()));
     }
 
     private BooleanExpression eqIsChecked(TFCode isChecked) {
